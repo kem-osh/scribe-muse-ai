@@ -2,95 +2,188 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Amythic AI Design System - Minimalist Content Workspace */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Brand Colors - Amythic AI */
+    --primary: 220 18% 12%;        /* #111827 - Dark slate */
+    --primary-foreground: 0 0% 100%;
+    --accent: 235 85% 65%;         /* #6366F1 - Indigo */
+    --accent-foreground: 0 0% 100%;
+    
+    /* Neutral Palette */
+    --background: 0 0% 100%;       /* Clean white */
+    --foreground: 220 18% 12%;     /* Dark slate text */
+    
+    --surface: 0 0% 98%;           /* Soft gray surface */
+    --surface-secondary: 0 0% 96%; /* Slightly darker surface */
+    
+    --muted: 220 13% 91%;          /* Light gray borders */
+    --muted-foreground: 220 9% 46%; /* Medium gray text */
+    
+    /* Semantic Colors */
+    --success: 142 71% 45%;        /* Green */
+    --warning: 38 92% 50%;         /* Orange */
+    --destructive: 0 84% 60%;      /* Red */
+    --destructive-foreground: 0 0% 100%;
+    
+    /* UI Elements */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 220 18% 12%;
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 235 85% 65%;           /* Focus ring matches accent */
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --popover-foreground: 220 18% 12%;
+    
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 220 18% 12%;
+    
+    /* Layout */
+    --radius: 0.75rem;             /* Slightly more rounded */
+    
+    /* Chat specific colors */
+    --chat-user: 235 85% 65%;      /* User messages in accent */
+    --chat-ai: 0 0% 96%;           /* AI messages in light gray */
+    --chat-input: 0 0% 98%;        /* Input background */
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(235 85% 65%) 0%, hsl(235 85% 75%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 220 18% 12%;
+    --accent: 235 85% 65%;
+    --accent-foreground: 0 0% 100%;
+    
+    --background: 220 18% 12%;
+    --foreground: 0 0% 100%;
+    
+    --surface: 220 15% 16%;
+    --surface-secondary: 220 15% 20%;
+    
+    --muted: 220 15% 25%;
+    --muted-foreground: 220 5% 65%;
+    
+    --card: 220 15% 16%;
+    --card-foreground: 0 0% 100%;
+    
+    --border: 220 15% 25%;
+    --input: 220 15% 25%;
+    --ring: 235 85% 65%;
+    
+    --popover: 220 15% 16%;
+    --popover-foreground: 0 0% 100%;
+    
+    --secondary: 220 15% 25%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --chat-user: 235 85% 65%;
+    --chat-ai: 220 15% 20%;
+    --chat-input: 220 15% 16%;
+  }
+}
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+@layer base {
+  * {
+    @apply border-border;
+  }
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+@layer components {
+  /* Chat Interface Components */
+  .chat-container {
+    @apply flex flex-col h-full bg-gradient-to-b from-background to-surface;
+  }
+  
+  .chat-message {
+    @apply rounded-2xl px-4 py-3 max-w-[85%] break-words;
+  }
+  
+  .chat-message-user {
+    @apply bg-accent text-accent-foreground ml-auto;
+  }
+  
+  .chat-message-ai {
+    @apply bg-chat-ai text-foreground;
+  }
+  
+  /* Card Components */
+  .content-card {
+    @apply bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200;
+  }
+  
+  .content-card:hover {
+    @apply border-accent/20 shadow-accent/10;
+  }
+  
+  /* Input Components */
+  .input-primary {
+    @apply bg-surface border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-accent focus:ring-2 focus:ring-accent/20;
+  }
+  
+  /* Button Variants */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-6 py-2.5 font-medium transition-all duration-200;
+  }
+  
+  .btn-accent {
+    @apply bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl px-6 py-2.5 font-medium transition-all duration-200;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent text-muted-foreground hover:text-foreground hover:bg-surface rounded-xl px-4 py-2.5 font-medium transition-all duration-200;
+  }
+  
+  /* Tab Navigation */
+  .tab-nav {
+    @apply flex border-b border-border bg-surface/50 backdrop-blur-sm;
+  }
+  
+  .tab-item {
+    @apply px-6 py-3 text-sm font-medium text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-accent/50 transition-all duration-200;
+  }
+  
+  .tab-item-active {
+    @apply text-accent border-accent;
+  }
+  
+  /* Loading States */
+  .skeleton {
+    @apply bg-muted animate-pulse rounded-lg;
+  }
+  
+  /* Focus States */
+  .focus-outline {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 }
 

@@ -14,7 +14,155 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      content: {
+        Row: {
+          content: string
+          content_hash: string | null
+          content_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          source_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          content_hash?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          source_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          content_hash?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      content_versions: {
+        Row: {
+          content: string
+          content_id: string
+          created_at: string
+          edit_notes: string | null
+          id: string
+          title: string
+          version_number: number
+        }
+        Insert: {
+          content: string
+          content_id: string
+          created_at?: string
+          edit_notes?: string | null
+          id?: string
+          title: string
+          version_number?: number
+        }
+        Update: {
+          content?: string
+          content_id?: string
+          created_at?: string
+          edit_notes?: string | null
+          id?: string
+          title?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_versions_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      publish_history: {
+        Row: {
+          content_id: string
+          created_at: string
+          id: string
+          platform: string
+          platform_id: string | null
+          published_at: string | null
+          status: string
+          version_id: string | null
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          id?: string
+          platform: string
+          platform_id?: string | null
+          published_at?: string | null
+          status?: string
+          version_id?: string | null
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          id?: string
+          platform?: string
+          platform_id?: string | null
+          published_at?: string | null
+          status?: string
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publish_history_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publish_history_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "content_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,14 +1,28 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React from 'react';
+import { AuthForm } from '@/components/auth/AuthForm';
+import { Dashboard } from '@/components/dashboard/Dashboard';
+import { useAuth } from '@/hooks/useAuth';
+import { Loader2 } from 'lucide-react';
 
 const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-accent" />
+          <p className="text-muted-foreground">Loading Amythic AI...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (!user) {
+    return <AuthForm onAuthSuccess={() => {}} />;
+  }
+
+  return <Dashboard />;
 };
 
 export default Index;
