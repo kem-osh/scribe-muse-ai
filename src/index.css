@@ -169,7 +169,7 @@
   }
   
   .tab-item {
-    @apply px-6 py-3 text-sm font-medium text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-accent/50 transition-all duration-200;
+    @apply px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-accent/50 transition-all duration-200 touch-manipulation;
   }
   
   .tab-item-active {

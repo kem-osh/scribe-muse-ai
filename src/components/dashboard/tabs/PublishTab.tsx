@@ -257,13 +257,13 @@ export const PublishTab: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           {/* Publishing Form */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-4 sm:space-y-6 order-2 xl:order-1">
             {/* Content Selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Select Content</CardTitle>
+                <CardTitle className="text-lg">Select Content</CardTitle>
               </CardHeader>
               <CardContent>
                 <Select
@@ -273,7 +273,7 @@ export const PublishTab: React.FC = () => {
                     setSelectedContent(content || null);
                   }}
                 >
-                  <SelectTrigger className="input-primary">
+                  <SelectTrigger className="input-primary h-12">
                     <SelectValue placeholder="Choose content to publish" />
                   </SelectTrigger>
                   <SelectContent>
@@ -296,10 +296,10 @@ export const PublishTab: React.FC = () => {
             {selectedContent && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Choose Platform</CardTitle>
+                  <CardTitle className="text-lg">Choose Platform</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4">
                     {platforms.map((platform) => {
                       const Icon = platform.icon;
                       const isSelected = selectedPlatform === platform.id;
@@ -315,10 +315,10 @@ export const PublishTab: React.FC = () => {
                           }`}
                         >
                           <div className="flex items-center space-x-3">
-                            <Icon className="w-6 h-6 text-accent" />
-                            <div>
+                            <Icon className="w-6 h-6 text-accent flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
                               <h4 className="font-medium">{platform.name}</h4>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-sm text-muted-foreground">
                                 {platform.description}
                               </p>
                             </div>
@@ -335,15 +335,15 @@ export const PublishTab: React.FC = () => {
             {selectedPlatform && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Customizations (Optional)</CardTitle>
+                  <CardTitle className="text-lg">Customizations (Optional)</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Textarea
                     value={customizations}
                     onChange={(e) => setCustomizations(e.target.value)}
                     placeholder="Add hashtags, mentions, or additional content..."
-                    className="input-primary"
-                    rows={3}
+                    className="input-primary text-base"
+                    rows={4}
                   />
                 </CardContent>
               </Card>
@@ -353,12 +353,12 @@ export const PublishTab: React.FC = () => {
             {previewContent && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    Preview
+                  <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0 text-lg">
+                    <span>Preview</span>
                     <Button
                       onClick={handlePublish}
                       disabled={isPublishing}
-                      className="btn-accent"
+                      className="btn-accent h-12 sm:h-auto w-full sm:w-auto"
                     >
                       {isPublishing ? (
                         <>
@@ -389,10 +389,10 @@ export const PublishTab: React.FC = () => {
           </div>
 
           {/* Publish History */}
-          <div>
+          <div className="order-1 xl:order-2">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex items-center space-x-2 text-lg">
                   <History className="w-5 h-5" />
                   <span>Recent Publications</span>
                 </CardTitle>

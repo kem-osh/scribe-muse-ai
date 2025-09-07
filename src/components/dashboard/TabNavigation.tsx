@@ -36,10 +36,10 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`tab-item ${isActive ? 'tab-item-active' : ''} flex items-center space-x-2 flex-1 justify-center`}
+              className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 flex-1 min-h-[60px] sm:min-h-[48px] px-2 py-2`}
             >
-              <Icon className="w-4 h-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
+              <span className="text-xs sm:text-sm font-medium">{tab.label}</span>
             </button>
           );
         })}

@@ -160,11 +160,11 @@ export const CreateTab: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Metadata */}
-            <Card className="lg:col-span-1">
+            <Card className="lg:col-span-1 order-2 lg:order-1">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex items-center space-x-2 text-lg">
                   <FileText className="w-5 h-5" />
                   <span>Details</span>
                 </CardTitle>
@@ -252,9 +252,9 @@ export const CreateTab: React.FC = () => {
             </Card>
 
             {/* Content Editor */}
-            <Card className="lg:col-span-2">
+            <Card className="lg:col-span-2 order-1 lg:order-2">
               <CardHeader>
-                <CardTitle>Content *</CardTitle>
+                <CardTitle className="text-lg">Content *</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
@@ -262,7 +262,7 @@ export const CreateTab: React.FC = () => {
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Paste or type your content here..."
                   required
-                  className="input-primary min-h-[400px] resize-none"
+                  className="input-primary min-h-[300px] sm:min-h-[400px] resize-none text-base"
                 />
                 <div className="mt-2 text-xs text-muted-foreground">
                   {content.length > 0 && (
@@ -274,11 +274,11 @@ export const CreateTab: React.FC = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
+          <div className="flex justify-stretch sm:justify-end">
             <Button
               type="submit"
               disabled={!title.trim() || !content.trim() || isLoading}
-              className="btn-accent px-8"
+              className="btn-accent px-6 sm:px-8 w-full sm:w-auto h-12 sm:h-auto text-base"
             >
               {isLoading ? (
                 <>

@@ -107,7 +107,7 @@ export const AgentTab: React.FC = () => {
   return (
     <div className="chat-container h-full">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -116,9 +116,9 @@ export const AgentTab: React.FC = () => {
             <div
               className={`chat-message ${
                 message.role === 'user' ? 'chat-message-user' : 'chat-message-ai'
-              }`}
+              } max-w-[90%] sm:max-w-[85%]`}
             >
-              <div className="whitespace-pre-wrap">{message.content}</div>
+              <div className="whitespace-pre-wrap text-sm sm:text-base leading-relaxed">{message.content}</div>
               <div
                 className={`text-xs mt-2 ${
                   message.role === 'user' ? 'text-accent-foreground/70' : 'text-muted-foreground'
@@ -148,8 +148,8 @@ export const AgentTab: React.FC = () => {
       </div>
 
       {/* Input */}
-      <div className="border-t border-border bg-surface/50 p-6">
-        <form onSubmit={handleSubmit} className="flex space-x-4">
+      <div className="border-t border-border bg-surface/50 p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
             <Textarea
               ref={textareaRef}
@@ -157,26 +157,33 @@ export const AgentTab: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about your writing..."
-              className="input-primary min-h-[60px] max-h-[120px] resize-none"
+              className="input-primary min-h-[80px] sm:min-h-[60px] max-h-[120px] resize-none text-base"
               disabled={isLoading}
             />
           </div>
           <Button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="btn-accent self-end"
+            className="btn-accent sm:self-end h-12 sm:h-auto px-6"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4" />
+              <>
+                <Loader2 className="w-4 h-4 sm:mr-0" />
+                <span className="ml-2 sm:hidden">Sending...</span>
+              </>
             ) : (
-              <Send className="w-4 h-4" />
+              <>
+                <Send className="w-4 h-4 sm:mr-0" />
+                <span className="ml-2 sm:hidden">Send</span>
+              </>
             )}
           </Button>
         </form>
         
         <div className="mt-3 flex items-center justify-center text-xs text-muted-foreground">
           <Sparkles className="w-3 h-3 mr-1" />
-          Press Enter to send, Shift+Enter for new line
+          <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line</span>
+          <span className="sm:hidden">Tap send or use Enter</span>
         </div>
       </div>
     </div>

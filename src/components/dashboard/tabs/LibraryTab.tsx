@@ -200,21 +200,21 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Search */}
-              <div className="relative">
+              <div className="relative sm:col-span-2 lg:col-span-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search content..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-primary pl-10"
+                  className="input-primary pl-10 h-12 text-base"
                 />
               </div>
 
               {/* Type Filter */}
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="input-primary">
+                <SelectTrigger className="input-primary h-12">
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -231,7 +231,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
 
               {/* Sort */}
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="input-primary">
+                <SelectTrigger className="input-primary h-12">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -260,7 +260,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {content.map((item) => (
               <Card key={item.id} className="content-card group">
                 <CardHeader className="pb-3">
@@ -294,30 +294,35 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                       size="sm"
                       onClick={() => onSelectContent(item)}
-                      className="btn-accent flex-1"
+                      className="btn-accent flex-1 h-10"
                     >
-                      <Edit3 className="w-3 h-3 mr-1" />
+                      <Edit3 className="w-4 h-4 mr-2" />
                       Edit
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDuplicate(item)}
-                    >
-                      <Copy className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDelete(item.id)}
-                      className="hover:bg-destructive hover:text-destructive-foreground"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDuplicate(item)}
+                        className="flex-1 sm:flex-none h-10"
+                      >
+                        <Copy className="w-4 h-4 sm:mr-0 mr-2" />
+                        <span className="sm:hidden">Duplicate</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(item.id)}
+                        className="hover:bg-destructive hover:text-destructive-foreground flex-1 sm:flex-none h-10"
+                      >
+                        <Trash2 className="w-4 h-4 sm:mr-0 mr-2" />
+                        <span className="sm:hidden">Delete</span>
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

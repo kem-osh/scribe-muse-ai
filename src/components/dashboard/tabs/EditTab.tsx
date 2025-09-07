@@ -190,18 +190,18 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="border-b border-border bg-surface/50 p-4">
+      <div className="border-b border-border bg-surface/50 p-4 sm:p-4">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0 mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Edit Content</h1>
-              <p className="text-muted-foreground">Make improvements with AI assistance</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Edit Content</h1>
+              <p className="text-sm text-muted-foreground">Make improvements with AI assistance</p>
             </div>
             
             {/* View Mode Toggle */}
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
               <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-32 h-12 sm:h-auto">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -211,28 +211,30 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                 </SelectContent>
               </Select>
               
-              <Button onClick={handleReset} variant="outline" size="sm">
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Reset
-              </Button>
-              
-              <Button 
-                onClick={handleSave} 
-                disabled={isSaving}
-                className="btn-accent"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
+              <div className="flex space-x-2">
+                <Button onClick={handleReset} variant="outline" size="sm" className="flex-1 sm:flex-none h-12 sm:h-auto">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Reset
+                </Button>
+                
+                <Button 
+                  onClick={handleSave} 
+                  disabled={isSaving}
+                  className="btn-accent flex-1 sm:flex-none h-12 sm:h-auto"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -243,7 +245,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
               id="title"
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
-              className="input-primary"
+              className="input-primary h-12 text-base"
             />
           </div>
         </div>
@@ -252,9 +254,11 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       {/* Content Editor */}
       <div className="flex-1 overflow-hidden">
         <div className="h-full max-w-6xl mx-auto p-4">
-          <div className="grid h-full gap-4" style={{
-            gridTemplateColumns: viewMode === 'split' ? '1fr 1fr' : '1fr'
-          }}>
+          <div className={`grid h-full gap-4 ${
+            viewMode === 'split' 
+              ? 'grid-cols-1 lg:grid-cols-2' 
+              : 'grid-cols-1'
+          }`}>
             {/* Original/Edit Content */}
             {(viewMode === 'split' || viewMode === 'edit') && (
               <Card className="flex flex-col">
@@ -267,7 +271,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                   <Textarea
                     value={editedContent}
                     onChange={(e) => setEditedContent(e.target.value)}
-                    className="input-primary flex-1 resize-none"
+                    className="input-primary flex-1 resize-none text-base"
                     placeholder="Edit your content here..."
                   />
                   <div className="mt-2 text-xs text-muted-foreground">
@@ -305,27 +309,27 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
         <div className="max-w-6xl mx-auto">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2">
+              <CardTitle className="flex items-center space-x-2 text-lg">
                 <Sparkles className="w-5 h-5" />
                 <span>AI Assistant</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="sm:col-span-2 lg:col-span-1">
                   <Label htmlFor="edit-goal">Editing Goal</Label>
                   <Input
                     id="edit-goal"
                     value={editGoal}
                     onChange={(e) => setEditGoal(e.target.value)}
                     placeholder="Make it more engaging"
-                    className="input-primary"
+                    className="input-primary h-12 text-base"
                   />
                 </div>
                 <div>
                   <Label htmlFor="tone">Tone</Label>
                   <Select value={tone} onValueChange={setTone}>
-                    <SelectTrigger className="input-primary">
+                    <SelectTrigger className="input-primary h-12">
                       <SelectValue placeholder="Select tone" />
                     </SelectTrigger>
                     <SelectContent>
@@ -338,11 +342,11 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-end">
+                <div className="flex items-end sm:col-span-2 lg:col-span-1">
                   <Button
                     onClick={handleAISuggestion}
                     disabled={isLoading || !editGoal.trim()}
-                    className="btn-accent w-full"
+                    className="btn-accent w-full h-12"
                   >
                     {isLoading ? (
                       <>
@@ -366,7 +370,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                     <Button
                       size="sm"
                       onClick={handleApplySuggestion}
-                      className="btn-accent"
+                      className="btn-accent h-10"
                     >
                       Apply
                     </Button>
