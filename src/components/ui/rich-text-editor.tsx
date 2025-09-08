@@ -131,11 +131,27 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         
         @media (min-width: 768px) {
           .ql-container {
-            min-height: 60vh !important;
+            min-height: 70vh !important;
           }
           .ql-editor {
-            min-height: calc(60vh - 40px) !important;
+            min-height: calc(70vh - 40px) !important;
           }
+        }
+        
+        .rich-text-editor {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .rich-text-editor .ql-container {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .rich-text-editor .ql-editor {
+          flex: 1;
         }
         `
       }} />

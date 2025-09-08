@@ -220,240 +220,199 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header with integrated AI Assistant and controls */}
-      <div className="border-b border-border bg-surface/50 p-4">
-        <div className="max-w-7xl mx-auto space-y-4">
-          {/* Top row: Title and Save controls */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-2">
-              <h2 className="text-xl font-bold text-foreground">Edit Content</h2>
+      {/* Compact Header */}
+      <div className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur-sm">
+        <div className="px-4 py-2">
+          {/* First row: Title, View Mode, Actions */}
+          <div className="flex items-center justify-between gap-4 mb-2">
+            <div className="flex items-center space-x-2 min-w-0">
+              <h2 className="text-lg font-bold text-foreground">Edit Content</h2>
               {hasUnsavedChanges && (
-                <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full">
-                  Unsaved changes
+                <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">
+                  Unsaved
                 </span>
               )}
             </div>
             
-            <div className="flex flex-wrap items-center gap-2">
-              {/* View mode toggles */}
+            <div className="flex items-center gap-2 shrink-0">
               <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-28 h-8">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="split">Split View</SelectItem>
-                  <SelectItem value="edit">Edit Only</SelectItem>
-                  <SelectItem value="preview">Preview Only</SelectItem>
+                  <SelectItem value="split">Split</SelectItem>
+                  <SelectItem value="edit">Edit</SelectItem>
+                  <SelectItem value="preview">Preview</SelectItem>
                 </SelectContent>
               </Select>
 
-              {/* Action buttons */}
-              <div className="flex space-x-2">
-                <Button
-                  onClick={handleReset}
-                  disabled={!hasUnsavedChanges}
-                  variant="outline"
-                  size="sm"
-                  className="btn-outline"
-                >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Reset
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  disabled={!hasUnsavedChanges || isSaving}
-                  className="btn-primary"
-                  size="sm"
-                >
-                  {isSaving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Save
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Button
+                onClick={handleReset}
+                disabled={!hasUnsavedChanges}
+                variant="outline"
+                size="sm"
+                className="h-8 px-3"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Reset
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={!hasUnsavedChanges || isSaving}
+                className="btn-primary h-8 px-3"
+                size="sm"
+              >
+                {isSaving ? (
+                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                ) : (
+                  <Save className="w-3 h-3 mr-1" />
+                )}
+                {isSaving ? 'Saving...' : 'Save'}
+              </Button>
             </div>
           </div>
 
-          {/* Title Editor */}
-          <div>
-            <Label htmlFor="title">Title</Label>
+          {/* Second row: Title Editor */}
+          <Input
+            value={editedTitle}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            placeholder="Content title..."
+            className="input-primary h-8 text-sm mb-2"
+          />
+
+          {/* Third row: AI Assistant - Compact */}
+          <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-1 text-accent">
+              <Sparkles className="w-3 h-3" />
+              <span className="font-medium">AI:</span>
+            </div>
             <Input
-              id="title"
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              className="input-primary h-12 text-base"
+              value={editGoal}
+              onChange={(e) => setEditGoal(e.target.value)}
+              placeholder="Editing goal..."
+              className="input-primary h-7 text-xs flex-1"
             />
-          </div>
-
-          {/* AI Assistant Row */}
-          <div className="border border-accent/20 rounded-lg p-3 bg-accent/5">
-            <div className="flex items-center space-x-2 mb-3">
-              <Sparkles className="w-4 h-4 text-accent" />
-              <span className="font-medium text-accent text-sm">AI Assistant</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="sm:col-span-1">
-                <Input
-                  value={editGoal}
-                  onChange={(e) => setEditGoal(e.target.value)}
-                  placeholder="Editing goal..."
-                  className="input-primary h-9 text-sm"
-                />
-              </div>
-              <div>
-                <Select value={tone} onValueChange={setTone}>
-                  <SelectTrigger className="input-primary h-9">
-                    <SelectValue placeholder="Tone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
-                    <SelectItem value="formal">Formal</SelectItem>
-                    <SelectItem value="conversational">Conversational</SelectItem>
-                    <SelectItem value="persuasive">Persuasive</SelectItem>
-                    <SelectItem value="educational">Educational</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Button
-                  onClick={handleAISuggestion}
-                  disabled={isLoading || !editGoal.trim()}
-                  className="btn-accent w-full h-9"
-                  size="sm"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3 h-3 mr-2" />
-                      Suggest
-                    </>
-                  )}
-                </Button>
-              </div>
-              {aiSuggestion && (
-                <div>
-                  <Button
-                    size="sm"
-                    onClick={handleApplySuggestion}
-                    className="btn-accent h-9 w-full"
-                  >
-                    Apply Suggestion
-                  </Button>
-                </div>
+            <Select value={tone} onValueChange={setTone}>
+              <SelectTrigger className="input-primary h-7 w-24 text-xs">
+                <SelectValue placeholder="Tone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="professional">Professional</SelectItem>
+                <SelectItem value="casual">Casual</SelectItem>
+                <SelectItem value="formal">Formal</SelectItem>
+                <SelectItem value="conversational">Conversational</SelectItem>
+                <SelectItem value="persuasive">Persuasive</SelectItem>
+                <SelectItem value="educational">Educational</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleAISuggestion}
+              disabled={isLoading || !editGoal.trim()}
+              className="btn-accent h-7 px-2 text-xs"
+              size="sm"
+            >
+              {isLoading ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3" />
               )}
-            </div>
-            
+            </Button>
             {aiSuggestion && (
-              <div className="mt-3 border border-accent/20 rounded p-3 bg-background text-sm">
-                <div className="whitespace-pre-wrap">{aiSuggestion}</div>
-              </div>
+              <Button
+                size="sm"
+                onClick={handleApplySuggestion}
+                className="btn-accent h-7 px-2 text-xs"
+              >
+                Apply
+              </Button>
             )}
           </div>
+          
+          {/* AI Suggestion - Collapsible */}
+          {aiSuggestion && (
+            <div className="mt-2 border border-accent/20 rounded p-2 bg-accent/5 text-xs">
+              <div className="whitespace-pre-wrap line-clamp-3">{aiSuggestion}</div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Content Editor - Larger and more spacious */}
-      <div className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto p-6">
-          <div className={`grid gap-6 ${
+      {/* Content Editor - Maximum space (75%+ of viewport) */}
+      <div className="flex-1 min-h-0" style={{ minHeight: '75vh' }}>
+        <div className="h-full px-4 py-2">
+          <div className={`grid gap-2 h-full ${
             viewMode === 'split' 
               ? 'grid-cols-1 xl:grid-cols-2' 
               : 'grid-cols-1'
           }`}>
             {/* Original/Edit Content */}
             {(viewMode === 'split' || viewMode === 'edit') && (
-              <Card className="flex flex-col">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">
-                    {viewMode === 'split' ? 'Edit Content' : 'Content Editor'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  <div className="flex-1 min-h-0">
-                    <RichTextEditor
-                      value={editedContent}
-                      onChange={setEditedContent}
-                      placeholder="Edit your content here..."
-                      className="h-full"
-                    />
-                  </div>
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    {stripHtml(editedContent).split(/\s+/).length} words
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="flex flex-col h-full">
+                <div className="flex-1 min-h-0">
+                  <RichTextEditor
+                    value={editedContent}
+                    onChange={setEditedContent}
+                    placeholder="Edit your content here..."
+                    className="h-full"
+                  />
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground px-1">
+                  {stripHtml(editedContent).split(/\s+/).length} words
+                </div>
+              </div>
             )}
 
             {/* Preview */}
             {(viewMode === 'split' || viewMode === 'preview') && (
-              <Card className="flex flex-col">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">
-                      {viewMode === 'split' ? 'Preview' : 'Content Preview'}
-                    </CardTitle>
-                    {viewMode === 'split' && (
-                      <div className="flex bg-surface rounded-lg p-1">
-                        <button
-                          onClick={() => setPreviewSource('original')}
-                          className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                            previewSource === 'original'
-                              ? 'bg-background text-foreground shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          Original
-                        </button>
-                        <button
-                          onClick={() => setPreviewSource('edited')}
-                          className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                            previewSource === 'edited'
-                              ? 'bg-background text-foreground shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          Live
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="h-full p-4 bg-surface rounded-lg overflow-y-auto">
-                    <div className="prose prose-sm max-w-none">
-                      <div 
-                        className="rich-content"
-                        dangerouslySetInnerHTML={{
-                          __html: sanitizeHtml(
-                            viewMode === 'preview' 
-                              ? editedContent 
-                              : previewSource === 'edited' 
-                                ? editedContent 
-                                : originalContent
-                          )
-                        }}
-                      />
+              <div className="flex flex-col h-full">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Preview</span>
+                  {viewMode === 'split' && (
+                    <div className="flex bg-surface rounded p-0.5">
+                      <button
+                        onClick={() => setPreviewSource('original')}
+                        className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                          previewSource === 'original'
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Original
+                      </button>
+                      <button
+                        onClick={() => setPreviewSource('edited')}
+                        className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                          previewSource === 'edited'
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Live
+                      </button>
                     </div>
+                  )}
+                </div>
+                <div className="flex-1 p-3 bg-surface rounded overflow-y-auto">
+                  <div className="prose prose-sm max-w-none">
+                    <div 
+                      className="rich-content"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(
+                          viewMode === 'preview' 
+                            ? editedContent 
+                            : previewSource === 'edited' 
+                              ? editedContent 
+                              : originalContent
+                        )
+                      }}
+                    />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
           </div>
         </div>
       </div>
-
     </div>
   );
 };
