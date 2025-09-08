@@ -30,27 +30,28 @@ export const CreateTab: React.FC = () => {
       // Generate content hash for duplicate detection
       const contentHash = btoa(content.trim()).substring(0, 32);
 
-      // Send to webhook
-      const webhookResponse = await fetch('https://hook.eu2.make.com/gg9miys772hoitii1dt9u5ud5uiolug3', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          content: content.trim(),
-          contentType,
-          sourceUrl: sourceUrl.trim() || null,
-          contentHash,
-          userId: user.id,
-        }),
-      });
+      // Check for existing content with same hash (duplicate detection)
+      const { data: existingContent, error: checkError } = await supabase
+        .from('content')
+        .select('id, title')
+        .eq('user_id', user.id)
+        .eq('content_hash', contentHash)
+        .maybeSingle();
 
-      if (!webhookResponse.ok) {
-        console.warn('Webhook failed, but continuing to save to database');
+      if (checkError) {
+        throw checkError;
       }
 
-      // Save to Supabase
+      if (existingContent) {
+        toast({
+          variant: "destructive",
+          title: "Duplicate content detected",
+          description: `Similar content already exists: "${existingContent.title}"`,
+        });
+        return;
+      }
+
+      // Save directly to Supabase (no webhook)
       const { data, error } = await supabase
         .from('content')
         .insert({
