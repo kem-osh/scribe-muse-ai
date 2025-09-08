@@ -167,13 +167,13 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
 
   const getContentTypeColor = (type: string) => {
     const colors = {
-      article: 'bg-blue-100 text-blue-800',
-      'blog-post': 'bg-green-100 text-green-800',
-      'social-media': 'bg-purple-100 text-purple-800',
-      newsletter: 'bg-orange-100 text-orange-800',
-      script: 'bg-red-100 text-red-800',
-      notes: 'bg-yellow-100 text-yellow-800',
-      other: 'bg-gray-100 text-gray-800',
+      article: 'bg-primary/10 text-primary border-primary/20',
+      'blog-post': 'bg-secondary/10 text-secondary-foreground border-secondary/20',
+      'social-media': 'bg-accent/10 text-accent border-accent/20',
+      newsletter: 'bg-muted text-muted-foreground border-muted-foreground/20',
+      script: 'bg-destructive/10 text-destructive border-destructive/20',
+      notes: 'bg-foreground/10 text-foreground border-foreground/20',
+      other: 'bg-muted text-muted-foreground border-muted-foreground/20',
     };
     return colors[type as keyof typeof colors] || colors.other;
   };
@@ -302,14 +302,20 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                     })()}
                   </p>
                   
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{stripHtml(item.content).split(/\s+/).length} words</span>
-                    {item.source_url && (
-                      <span className="truncate ml-2">
-                        {new URL(item.source_url).hostname}
-                      </span>
-                    )}
-                  </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{stripHtml(item.content).split(/\s+/).length} words</span>
+                      {item.source_url && (() => {
+                        try {
+                          return (
+                            <span className="truncate ml-2">
+                              {new URL(item.source_url).hostname}
+                            </span>
+                          );
+                        } catch {
+                          return null;
+                        }
+                      })()}
+                    </div>
 
                   {/* Actions */}
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
