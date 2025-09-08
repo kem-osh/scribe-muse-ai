@@ -89,7 +89,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           color: hsl(var(--foreground)) !important;
           font-size: 0.875rem;
           line-height: 1.5;
-          min-height: 280px !important;
+          min-height: 400px !important;
         }
         
         .ql-toolbar {
@@ -105,7 +105,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           border-left: 1px solid hsl(var(--border)) !important;
           border-right: 1px solid hsl(var(--border)) !important;
           border-top: none !important;
-          min-height: 320px !important;
+          min-height: 440px !important;
         }
         
         .ql-toolbar .ql-stroke {
@@ -131,10 +131,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         
         @media (min-width: 768px) {
           .ql-container {
-            min-height: 50vh !important;
+            min-height: 60vh !important;
           }
           .ql-editor {
-            min-height: calc(50vh - 40px) !important;
+            min-height: calc(60vh - 40px) !important;
           }
         }
         `

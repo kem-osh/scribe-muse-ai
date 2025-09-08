@@ -1,16 +1,22 @@
 import React from 'react';
 import { TabType } from './Dashboard';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   MessageSquare, 
   Plus, 
   Library, 
   Edit3, 
-  Share2 
+  Share2,
+  Sparkles,
+  LogOut
 } from 'lucide-react';
+import { User } from '@supabase/supabase-js';
 
 interface TabNavigationProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  user: User | null;
 }
 
 const tabs = [
@@ -24,25 +30,59 @@ const tabs = [
 export const TabNavigation: React.FC<TabNavigationProps> = ({
   activeTab,
   onTabChange,
+  user
 }) => {
+  const { signOut } = useAuth();
+
   return (
-    <nav className="tab-nav">
-      <div className="flex w-full">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          
-          return (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 flex-1 min-h-[60px] sm:min-h-[48px] px-2 py-2`}
-            >
-              <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm font-medium">{tab.label}</span>
-            </button>
-          );
-        })}
+    <nav className="border-b border-border bg-surface/50 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3">
+        {/* Brand */}
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <div className="hidden sm:block">
+            <h1 className="text-lg font-semibold text-foreground">Flux Capacitor AI</h1>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex-1 max-w-2xl mx-4">
+          <div className="flex">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 flex-1 min-h-[50px] sm:min-h-[40px] px-2 py-2`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm font-medium">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* User Info & Sign Out */}
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="hidden lg:block text-right min-w-0">
+            <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={signOut}
+            className="btn-ghost flex-shrink-0"
+          >
+            <LogOut className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Sign Out</span>
+          </Button>
+        </div>
       </div>
     </nav>
   );
