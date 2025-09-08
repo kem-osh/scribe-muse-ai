@@ -18,7 +18,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { stripHtml } from '@/lib/utils';
+import { stripHtml, sanitizeHtml } from '@/lib/utils';
 
 interface Content {
   id: string;
@@ -42,6 +42,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('');
   const [viewMode, setViewMode] = useState<'split' | 'edit' | 'preview'>('split');
+  const [previewSource, setPreviewSource] = useState<'original' | 'edited'>('edited');
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -53,6 +54,31 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       setAiSuggestion('');
     }
   }, [selectedContent]);
+
+  // Keyboard shortcuts and unsaved changes warning
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (editedContent !== originalContent || editedTitle !== selectedContent?.title) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [editedContent, originalContent, editedTitle, selectedContent?.title]);
 
   const handleAISuggestion = async () => {
     if (!selectedContent || !editGoal.trim()) {
@@ -289,9 +315,35 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
             {(viewMode === 'split' || viewMode === 'preview') && (
               <Card className="flex flex-col">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">
-                    {viewMode === 'split' ? 'Original Content' : 'Content Preview'}
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">
+                      {viewMode === 'split' ? 'Preview' : 'Content Preview'}
+                    </CardTitle>
+                    {viewMode === 'split' && (
+                      <div className="flex bg-surface rounded-lg p-1">
+                        <button
+                          onClick={() => setPreviewSource('original')}
+                          className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                            previewSource === 'original'
+                              ? 'bg-background text-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          Original
+                        </button>
+                        <button
+                          onClick={() => setPreviewSource('edited')}
+                          className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                            previewSource === 'edited'
+                              ? 'bg-background text-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          Live
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <div className="h-full p-4 bg-surface rounded-lg overflow-y-auto">
@@ -299,7 +351,13 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                       <div 
                         className="rich-content"
                         dangerouslySetInnerHTML={{
-                          __html: viewMode === 'preview' ? editedContent : originalContent
+                          __html: sanitizeHtml(
+                            viewMode === 'preview' 
+                              ? editedContent 
+                              : previewSource === 'edited' 
+                                ? editedContent 
+                                : originalContent
+                          )
                         }}
                       />
                     </div>

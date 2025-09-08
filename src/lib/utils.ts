@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import DOMPurify from 'dompurify';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,4 +31,9 @@ export function stripHtml(html: string): string {
   // Get text content and clean up extra whitespace
   const textContent = tempDiv.textContent || tempDiv.innerText || '';
   return textContent.replace(/\s+/g, ' ').trim();
+}
+
+// Sanitize HTML content for safe rendering
+export function sanitizeHtml(html: string): string {
+  return DOMPurify.sanitize(html);
 }

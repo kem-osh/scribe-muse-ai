@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
-import { stripHtml } from '@/lib/utils';
+import { stripHtml, sanitizeHtml } from '@/lib/utils';
 
 interface Content {
   id: string;
@@ -389,7 +389,7 @@ export const PublishTab: React.FC = () => {
                     {selectedPlatform === 'medium' || selectedPlatform === 'blog' ? (
                       <div 
                         className="text-sm rich-content"
-                        dangerouslySetInnerHTML={{ __html: previewContent }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(previewContent) }}
                       />
                     ) : (
                       <div className="whitespace-pre-wrap text-sm">
