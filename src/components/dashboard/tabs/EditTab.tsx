@@ -18,7 +18,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { stripHtml, sanitizeHtml } from '@/lib/utils';
+import { stripHtml, renderForPreview } from '@/lib/utils';
 
 interface Content {
   id: string;
@@ -397,7 +397,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                     <div 
                       className="rich-content"
                       dangerouslySetInnerHTML={{
-                        __html: sanitizeHtml(
+                        __html: renderForPreview(
                           viewMode === 'preview' 
                             ? editedContent 
                             : previewSource === 'edited' 

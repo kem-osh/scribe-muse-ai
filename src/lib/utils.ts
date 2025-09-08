@@ -37,3 +37,48 @@ export function stripHtml(html: string): string {
 export function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html);
 }
+
+// Check if content is likely HTML (has HTML tags)
+export function isLikelyHtml(content: string): boolean {
+  return /<[a-z][\s\S]*>/i.test(content);
+}
+
+// Escape HTML entities in plain text
+export function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Convert plain text to HTML with proper paragraph and line break formatting
+export function toHtmlFromPlainText(text: string): string {
+  if (!text) return '';
+  
+  // Escape HTML entities first
+  const escaped = escapeHtml(text);
+  
+  // Split by double newlines to create paragraphs
+  const paragraphs = escaped.split(/\n\s*\n/);
+  
+  return paragraphs
+    .map(paragraph => {
+      // Replace single newlines with <br> tags within paragraphs
+      const withBreaks = paragraph.replace(/\n/g, '<br>');
+      return `<p>${withBreaks}</p>`;
+    })
+    .join('');
+}
+
+// Main function to render content for preview (handles both HTML and plain text)
+export function renderForPreview(content: string): string {
+  if (!content) return '';
+  
+  if (isLikelyHtml(content)) {
+    // Content appears to be HTML, just sanitize it
+    return sanitizeHtml(content);
+  } else {
+    // Content is plain text, convert to HTML with proper formatting
+    const htmlContent = toHtmlFromPlainText(content);
+    return sanitizeHtml(htmlContent);
+  }
+}
