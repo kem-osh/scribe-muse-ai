@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { parseWebhookResponse, createWebhookRequest } from '@/lib/webhookUtils';
 
 interface Message {
   id: string;
@@ -50,27 +51,43 @@ export const AgentTab: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      console.log('Sending message to webhook:', {
+        message: input.trim(),
+        type: 'agent_chat',
+        conversation_history: messages.slice(-5)
+      });
+
+      const response = await fetch('https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40', 
+        createWebhookRequest({
           message: input.trim(),
           type: 'agent_chat',
           conversation_history: messages.slice(-5), // Send last 5 messages for context
-        }),
+        })
+      );
+
+      console.log('Webhook response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get AI response');
-      }
+      const data = await parseWebhookResponse(response);
+      
+      console.log('Parsed webhook data:', data);
 
-      const data = await response.json();
+      // Handle different response types
+      let aiContent: string;
+      if (data.error) {
+        aiContent = `I'm sorry, there was an error processing your message: ${data.error}`;
+      } else if (data.status === 'accepted') {
+        aiContent = data.response || "I've received your message and I'm processing it. Please wait a moment.";
+      } else {
+        aiContent = data.response || "I apologize, but I'm having trouble responding right now. Please try again.";
+      }
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response || "I apologize, but I'm having trouble responding right now. Please try again.",
+        content: aiContent,
         role: 'assistant',
         timestamp: new Date(),
       };
