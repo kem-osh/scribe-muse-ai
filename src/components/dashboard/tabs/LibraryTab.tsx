@@ -58,9 +58,15 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
         query = query.eq('content_type', filterType);
       }
 
-      // Apply sorting
+      // Apply sorting - map UI sort fields to DB columns
       const [sortField, sortDirection] = sortBy.split('_');
-      query = query.order(sortField, { ascending: sortDirection === 'asc' });
+      const sortFieldMap: Record<string, string> = {
+        'created': 'created_at',
+        'updated': 'updated_at',
+        'title': 'title'
+      };
+      const dbSortField = sortFieldMap[sortField] || 'created_at';
+      query = query.order(dbSortField, { ascending: sortDirection === 'asc' });
 
       const { data, error } = await query;
 

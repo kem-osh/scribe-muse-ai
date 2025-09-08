@@ -9,6 +9,7 @@ import { Upload, Link2, FileText, Loader2, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { normalizeContent, sha256Hex } from '@/lib/utils';
 
 export const CreateTab: React.FC = () => {
   const [title, setTitle] = useState('');
@@ -27,8 +28,10 @@ export const CreateTab: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Generate content hash for duplicate detection
-      const contentHash = btoa(content.trim()).substring(0, 32);
+      // Generate content hash for duplicate detection (Unicode-safe)
+      const normalizedContent = normalizeContent(content);
+      const fullHash = await sha256Hex(normalizedContent);
+      const contentHash = fullHash.substring(0, 32);
 
       // Check for existing content with same hash (duplicate detection)
       const { data: existingContent, error: checkError } = await supabase
@@ -63,7 +66,7 @@ export const CreateTab: React.FC = () => {
           content_hash: contentHash,
           metadata: {
             created_via: 'create_tab',
-            word_count: content.trim().split(/\s+/).length,
+            word_count: normalizedContent.split(/\s+/).length,
           },
         })
         .select()
