@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
+import { stripHtml } from '@/lib/utils';
 
 interface Content {
   id: string;
@@ -76,10 +77,12 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
       let filteredData = data || [];
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
-        filteredData = filteredData.filter(item =>
-          item.title.toLowerCase().includes(query) ||
-          item.content.toLowerCase().includes(query)
-        );
+        filteredData = filteredData.filter(item => {
+          const plainContent = stripHtml(item.content);
+          return item.title.toLowerCase().includes(query) ||
+            plainContent.toLowerCase().includes(query) ||
+            item.content_type.toLowerCase().includes(query);
+        });
       }
 
       setContent(filteredData);
@@ -268,7 +271,11 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {content.map((item) => (
-              <Card key={item.id} className="content-card group">
+              <Card 
+                key={item.id} 
+                className="content-card group cursor-pointer hover:shadow-lg transition-all"
+                onClick={() => onSelectContent(item)}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -287,11 +294,16 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-sm text-muted-foreground line-clamp-3">
-                    {item.content.substring(0, 150)}...
+                    {(() => {
+                      const plainContent = stripHtml(item.content);
+                      return plainContent.length > 150 
+                        ? `${plainContent.substring(0, 150)}...` 
+                        : plainContent;
+                    })()}
                   </p>
                   
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{item.content.split(/\s+/).length} words</span>
+                    <span>{stripHtml(item.content).split(/\s+/).length} words</span>
                     {item.source_url && (
                       <span className="truncate ml-2">
                         {new URL(item.source_url).hostname}
@@ -303,7 +315,10 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                       size="sm"
-                      onClick={() => onSelectContent(item)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectContent(item);
+                      }}
                       className="btn-accent flex-1 h-10"
                     >
                       <Edit3 className="w-4 h-4 mr-2" />
@@ -313,7 +328,10 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDuplicate(item)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDuplicate(item);
+                        }}
                         className="flex-1 sm:flex-none h-10"
                       >
                         <Copy className="w-4 h-4 sm:mr-0 mr-2" />
@@ -322,7 +340,10 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDelete(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
                         className="hover:bg-destructive hover:text-destructive-foreground flex-1 sm:flex-none h-10"
                       >
                         <Trash2 className="w-4 h-4 sm:mr-0 mr-2" />

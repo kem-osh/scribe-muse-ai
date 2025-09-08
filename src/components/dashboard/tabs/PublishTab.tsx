@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
+import { stripHtml } from '@/lib/utils';
 
 interface Content {
   id: string;
@@ -109,24 +110,33 @@ export const PublishTab: React.FC = () => {
   const generatePreview = () => {
     if (!selectedContent) return;
 
+    // Strip HTML for plain text platforms but keep rich content for web platforms
+    const plainContent = stripHtml(selectedContent.content);
     let formatted = selectedContent.content;
 
     // Platform-specific formatting
     switch (selectedPlatform) {
       case 'twitter':
-        // Truncate for Twitter
+        // Use plain text for Twitter and truncate
+        formatted = plainContent;
         if (formatted.length > 250) {
           formatted = formatted.substring(0, 247) + '...';
         }
         break;
       case 'linkedin':
-        // Add professional formatting
-        formatted = `${selectedContent.title}\n\n${formatted}\n\n#professional #content`;
+        // Use plain text with professional formatting
+        formatted = `${selectedContent.title}\n\n${plainContent}\n\n#professional #content`;
         break;
       case 'medium':
-        // Add title and medium-style formatting
-        formatted = `# ${selectedContent.title}\n\n${formatted}`;
+        // Keep HTML for Medium but add title
+        formatted = `# ${selectedContent.title}\n\n${selectedContent.content}`;
         break;
+      case 'blog':
+        // Keep HTML for blog posts
+        formatted = selectedContent.content;
+        break;
+      default:
+        formatted = plainContent;
     }
 
     // Apply custom modifications
@@ -376,11 +386,18 @@ export const PublishTab: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="bg-surface rounded-lg p-4 border">
-                    <div className="whitespace-pre-wrap text-sm">
-                      {previewContent}
-                    </div>
+                    {selectedPlatform === 'medium' || selectedPlatform === 'blog' ? (
+                      <div 
+                        className="text-sm rich-content"
+                        dangerouslySetInnerHTML={{ __html: previewContent }}
+                      />
+                    ) : (
+                      <div className="whitespace-pre-wrap text-sm">
+                        {previewContent}
+                      </div>
+                    )}
                     <div className="mt-2 text-xs text-muted-foreground">
-                      {previewContent.length} characters
+                      {stripHtml(previewContent).length} characters
                     </div>
                   </div>
                 </CardContent>

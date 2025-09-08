@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { 
   Save, 
   Loader2, 
@@ -17,6 +18,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { stripHtml } from '@/lib/utils';
 
 interface Content {
   id: string;
@@ -268,14 +270,16 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
-                  <Textarea
-                    value={editedContent}
-                    onChange={(e) => setEditedContent(e.target.value)}
-                    className="input-primary flex-1 resize-none text-base"
-                    placeholder="Edit your content here..."
-                  />
+                  <div className="flex-1 min-h-0">
+                    <RichTextEditor
+                      value={editedContent}
+                      onChange={setEditedContent}
+                      placeholder="Edit your content here..."
+                      className="h-full"
+                    />
+                  </div>
                   <div className="mt-2 text-xs text-muted-foreground">
-                    {editedContent.split(/\s+/).length} words
+                    {stripHtml(editedContent).split(/\s+/).length} words
                   </div>
                 </CardContent>
               </Card>
@@ -292,9 +296,12 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                 <CardContent className="flex-1">
                   <div className="h-full p-4 bg-surface rounded-lg overflow-y-auto">
                     <div className="prose prose-sm max-w-none">
-                      <div className="whitespace-pre-wrap">
-                        {viewMode === 'preview' ? editedContent : originalContent}
-                      </div>
+                      <div 
+                        className="rich-content"
+                        dangerouslySetInnerHTML={{
+                          __html: viewMode === 'preview' ? editedContent : originalContent
+                        }}
+                      />
                     </div>
                   </div>
                 </CardContent>

@@ -20,3 +20,14 @@ export async function sha256Hex(text: string): Promise<string> {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+// Strip HTML tags and decode entities for plain text display
+export function stripHtml(html: string): string {
+  // Create a temporary DOM element to parse HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  
+  // Get text content and clean up extra whitespace
+  const textContent = tempDiv.textContent || tempDiv.innerText || '';
+  return textContent.replace(/\s+/g, ' ').trim();
+}
