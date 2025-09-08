@@ -73,7 +73,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialTab = 'agent' }) =>
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-auto">
         {renderTabContent()}
       </main>
     </div>

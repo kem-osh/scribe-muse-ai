@@ -280,9 +280,9 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       </div>
 
       {/* Content Editor */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full max-w-6xl mx-auto p-4">
-          <div className={`grid h-full gap-4 ${
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-6xl mx-auto p-4">
+          <div className={`grid min-h-0 gap-4 ${
             viewMode === 'split' 
               ? 'grid-cols-1 lg:grid-cols-2' 
               : 'grid-cols-1'
