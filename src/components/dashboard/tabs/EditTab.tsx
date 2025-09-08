@@ -395,7 +395,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                 <div className="flex-1 p-3 bg-surface rounded overflow-y-auto">
                   <div className="prose prose-sm max-w-none">
                     <div 
-                      className="rich-content"
+                      className="rich-content whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{
                         __html: renderForPreview(
                           viewMode === 'preview' 

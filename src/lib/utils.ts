@@ -38,9 +38,14 @@ export function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html);
 }
 
-// Check if content is likely HTML (has HTML tags)
+// Check if content is likely HTML (has HTML tags that aren't just escaped)
 export function isLikelyHtml(content: string): boolean {
-  return /<[a-z][\s\S]*>/i.test(content);
+  // More comprehensive HTML detection
+  const htmlTags = /<(?!\/?\s*(?:br|p)\s*\/?>)[a-z][\s\S]*?>/i;
+  const hasActualTags = htmlTags.test(content);
+  
+  // If it has more than just basic tags or has attributes, it's likely HTML
+  return hasActualTags || /<[a-z]+\s+[^>]*>/i.test(content);
 }
 
 // Escape HTML entities in plain text
@@ -54,16 +59,20 @@ export function escapeHtml(text: string): string {
 export function toHtmlFromPlainText(text: string): string {
   if (!text) return '';
   
+  // Normalize line endings (handle Windows \r\n)
+  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  
   // Escape HTML entities first
-  const escaped = escapeHtml(text);
+  const escaped = escapeHtml(normalized);
   
   // Split by double newlines to create paragraphs
   const paragraphs = escaped.split(/\n\s*\n/);
   
   return paragraphs
+    .filter(p => p.trim()) // Remove empty paragraphs
     .map(paragraph => {
       // Replace single newlines with <br> tags within paragraphs
-      const withBreaks = paragraph.replace(/\n/g, '<br>');
+      const withBreaks = paragraph.trim().replace(/\n/g, '<br>');
       return `<p>${withBreaks}</p>`;
     })
     .join('');
