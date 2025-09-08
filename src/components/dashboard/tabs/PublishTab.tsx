@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
-import { stripHtml, sanitizeHtml } from '@/lib/utils';
+import { stripHtml, sanitizeHtml, renderForPreview } from '@/lib/utils';
 
 interface Content {
   id: string;
@@ -386,16 +386,10 @@ export const PublishTab: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="bg-surface rounded-lg p-4 border">
-                    {selectedPlatform === 'medium' || selectedPlatform === 'blog' ? (
-                      <div 
-                        className="text-sm rich-content"
-                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(previewContent) }}
-                      />
-                    ) : (
-                      <div className="whitespace-pre-wrap text-sm">
-                        {previewContent}
-                      </div>
-                    )}
+                    <div 
+                      className="text-sm rich-content whitespace-pre-wrap"
+                      dangerouslySetInnerHTML={{ __html: renderForPreview(previewContent) }}
+                    />
                     <div className="mt-2 text-xs text-muted-foreground">
                       {stripHtml(previewContent).length} characters
                     </div>
