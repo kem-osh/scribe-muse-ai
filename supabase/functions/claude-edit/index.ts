@@ -28,14 +28,18 @@ interface ClaudeResponse {
 }
 
 serve(async (req) => {
+  console.log('🚀 Edge function started, method:', req.method);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('✅ CORS preflight handled');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('📥 Parsing request body...');
     const requestBody: EditRequest = await req.json();
-    console.log('Claude API request:', { 
+    console.log('✅ Request parsed successfully:', { 
       type: requestBody.type, 
       goal: requestBody.goal,
       tone: requestBody.tone,
@@ -43,9 +47,12 @@ serve(async (req) => {
       messageLength: requestBody.message?.length || 0
     });
 
+    console.log('🔑 Checking API key availability...');
     if (!anthropicApiKey) {
+      console.error('❌ Claude API key not configured');
       throw new Error('Claude API key not configured');
     }
+    console.log('✅ API key is present');
 
     let systemPrompt = '';
     let userPrompt = '';
@@ -120,6 +127,7 @@ Guidelines:
       throw new Error('Invalid request type');
     }
 
+    console.log('🌐 Making Claude API call...');
     // Call Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -141,14 +149,16 @@ Guidelines:
       }),
     });
 
+    console.log('📡 Claude API response status:', response.status);
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Claude API error:', { status: response.status, error: errorText });
+      console.error('❌ Claude API error:', { status: response.status, error: errorText });
       throw new Error(`Claude API error: ${response.status} - ${errorText}`);
     }
 
+    console.log('📄 Parsing Claude API response...');
     const data: ClaudeResponse = await response.json();
-    console.log('Claude API response received successfully');
+    console.log('✅ Claude API response received successfully, content length:', data.content[0]?.text?.length || 0);
 
     const responseContent = data.content[0].text;
 
@@ -170,10 +180,18 @@ Guidelines:
     });
 
   } catch (error) {
-    console.error('Error in claude-edit function:', error);
+    console.error('💥 FATAL ERROR in claude-edit function:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     return new Response(JSON.stringify({ 
       error: error.message,
-      status: 'error'
+      status: 'error',
+      debug_info: {
+        error_name: error.name,
+        timestamp: new Date().toISOString()
+      }
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
