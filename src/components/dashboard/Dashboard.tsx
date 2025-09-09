@@ -48,7 +48,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialTab = 'agent' }) =>
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto bg-gradient-to-b from-transparent via-surface/10 to-surface/30">
-        {renderTabContent()}
+        <div className="min-h-full">
+          {renderTabContent()}
+        </div>
       </main>
 
       {/* Feedback Tab - appears on all pages */}

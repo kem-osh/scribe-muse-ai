@@ -154,8 +154,8 @@ export const CreateTab: React.FC = () => {
   };
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="h-full overflow-y-auto p-3 sm:p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         <div className="text-center space-y-4 mb-2">
           <div className="relative inline-block">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
@@ -168,10 +168,10 @@ export const CreateTab: React.FC = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
             {/* Metadata */}
-            <Card className="lg:col-span-1 order-2 lg:order-1 content-card border-2">
+            <Card className="xl:col-span-1 order-2 xl:order-1 content-card border-2">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center space-x-2 text-lg text-primary">
                   <div className="p-2 bg-primary/10 rounded-xl">
@@ -196,10 +196,10 @@ export const CreateTab: React.FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="content-type">Content Type</Label>
                   <Select value={contentType} onValueChange={setContentType}>
-                    <SelectTrigger className="input-primary">
+                    <SelectTrigger className="input-primary h-12">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
                       <SelectItem value="article">Article</SelectItem>
                       <SelectItem value="blog-post">Blog Post</SelectItem>
                       <SelectItem value="social-media">Social Media</SelectItem>
@@ -263,7 +263,7 @@ export const CreateTab: React.FC = () => {
             </Card>
 
             {/* Content Editor */}
-            <Card className="lg:col-span-2 order-1 lg:order-2 content-card border-2">
+            <Card className="xl:col-span-2 order-1 xl:order-2 content-card border-2">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg flex items-center space-x-2 text-primary">
                   <div className="p-2 bg-primary/10 rounded-xl">
@@ -278,7 +278,7 @@ export const CreateTab: React.FC = () => {
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Paste or type your content here..."
                   required
-                  className="input-primary min-h-[300px] sm:min-h-[400px] resize-none text-base"
+                  className="input-primary min-h-[250px] sm:min-h-[300px] lg:min-h-[400px] xl:min-h-[450px] resize-none text-base"
                 />
                 <div className="mt-2 text-xs text-muted-foreground">
                   {content.length > 0 && (
