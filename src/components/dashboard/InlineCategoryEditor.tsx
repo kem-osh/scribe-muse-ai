@@ -85,15 +85,15 @@ export const InlineCategoryEditor: React.FC<InlineCategoryEditorProps> = ({
         </Badge>
       ) : (
         <Select 
-          value={currentCategory?.id || ""} 
-          onValueChange={updateCategory}
+          value={currentCategory?.id || "none"} 
+          onValueChange={(value) => updateCategory(value === "none" ? undefined : value)}
           disabled={isUpdating}
         >
           <SelectTrigger className="w-auto h-6 px-2 text-xs border-dashed hover:border-primary/50">
             <SelectValue placeholder="Add category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No category</SelectItem>
+            <SelectItem value="none">No category</SelectItem>
             {availableCategories.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 <div className="flex items-center space-x-2">
