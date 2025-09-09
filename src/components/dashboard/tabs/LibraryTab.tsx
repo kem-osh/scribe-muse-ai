@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { 
   Search, 
   FileText, 
@@ -32,6 +34,8 @@ import { format } from 'date-fns';
 import { stripHtml } from '@/lib/utils';
 import { SynthesizeDialog } from '../SynthesizeDialog';
 import { CategoryManager } from '../CategoryManager';
+import { InlineTagEditor } from '../InlineTagEditor';
+import { InlineCategoryEditor } from '../InlineCategoryEditor';
 
 interface Content {
   id: string;
@@ -44,6 +48,7 @@ interface Content {
   metadata: any;
   category_id?: string;
   category?: {
+    id: string;
     name: string;
     color: string;
   };
@@ -95,7 +100,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
         .from('content')
         .select(`
           *,
-          category:categories(name, color)
+          category:categories(id, name, color)
         `)
         .eq('user_id', user.id);
 
@@ -370,6 +375,18 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
     });
   };
 
+  const handleTagsChange = (contentId: string, newTags: any[]) => {
+    setContent(prev => prev.map(item => 
+      item.id === contentId ? { ...item, tags: newTags } : item
+    ));
+  };
+
+  const handleCategoryChange = (contentId: string, newCategory?: any) => {
+    setContent(prev => prev.map(item => 
+      item.id === contentId ? { ...item, category: newCategory, category_id: newCategory?.id } : item
+    ));
+  };
+
   const getSelectedContent = () => {
     return content.filter(item => selectedItems.includes(item.id));
   };
@@ -575,7 +592,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="space-y-4">
               {content.map((item) => (
                 <Card 
                   key={item.id} 
@@ -583,154 +600,132 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                     selectedItems.includes(item.id) ? 'content-card-selected' : ''
                   }`}
                   onClick={(e) => {
-                    if ((e.target as HTMLElement).closest('.card-actions')) return;
+                    if ((e.target as HTMLElement).closest('.card-actions, .inline-editor')) return;
                     onSelectContent(item);
                   }}
                 >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-3 flex-1 min-w-0">
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectItem(item.id);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          {selectedItems.includes(item.id) ? (
-                            <div className="w-5 h-5 bg-primary text-primary-foreground rounded-md flex items-center justify-center shadow-sm">
-                              <CheckSquare className="w-4 h-4" />
-                            </div>
-                          ) : (
-                            <div className="w-5 h-5 border-2 border-muted-foreground/30 rounded-md hover:border-primary/50 transition-colors group-hover:border-primary/40" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg font-semibold line-clamp-2 hover:text-primary transition-colors">
-                            {item.title}
-                          </CardTitle>
-                          <CardDescription className="flex items-center flex-wrap gap-2 mt-2">
-                            <Badge className={`${getContentTypeColor(item.content_type)} text-xs px-3 py-1 font-medium`}>
-                              {item.content_type.replace('-', ' ')}
-                            </Badge>
-                            {item.category && (
-                              <Badge 
-                                variant="outline" 
-                                className="text-xs px-3 py-1 border-2"
-                                style={{ 
-                                  borderColor: item.category.color + '40',
-                                  backgroundColor: item.category.color + '10',
-                                  color: item.category.color 
-                                }}
-                              >
-                                <Folder className="w-3 h-3 mr-1" />
-                                {item.category.name}
-                              </Badge>
-                            )}
-                            <span className="text-xs text-muted-foreground/80 flex items-center bg-muted/40 px-2 py-1 rounded-lg">
-                              <Calendar className="w-3 h-3 mr-1" />
-                              {format(new Date(item.created_at), 'MMM d')}
-                            </span>
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
-                      {(() => {
-                        const plainContent = stripHtml(item.content);
-                        return plainContent.length > 150 
-                          ? `${plainContent.substring(0, 150)}...` 
-                          : plainContent;
-                      })()}
-                    </p>
-
-                    {/* Tags */}
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {item.tags.slice(0, 3).map((tag) => (
-                                <Badge 
-                                  key={tag.id}
-                                  variant="secondary" 
-                                  className="text-xs px-3 py-1 rounded-full font-medium hover:scale-105 transition-transform"
-                                  style={{ 
-                                    backgroundColor: `${tag.color}15`,
-                                    color: tag.color,
-                                    borderColor: `${tag.color}30`,
-                                    border: '1px solid'
-                                  }}
-                                >
-                                  <Tag className="w-2 h-2 mr-1" />
-                                  {tag.name}
-                                </Badge>
-                        ))}
-                        {item.tags.length > 3 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{item.tags.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{stripHtml(item.content).split(/\s+/).length} words</span>
-                      {item.source_url && (() => {
-                        try {
-                          return (
-                            <span className="truncate ml-2">
-                              {new URL(item.source_url).hostname}
-                            </span>
-                          );
-                        } catch {
-                          return null;
-                        }
-                      })()}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="card-actions flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <Button
-                        size="sm"
+                  <CardContent className="p-6">
+                    <div className="flex gap-4">
+                      {/* Selection Checkbox */}
+                      <div
                         onClick={(e) => {
                           e.stopPropagation();
-                          onSelectContent(item);
+                          handleSelectItem(item.id);
                         }}
-                        className="btn-accent flex-1 h-10 rounded-xl shadow-sm hover:shadow-md"
+                        className="cursor-pointer flex-shrink-0 mt-1"
                       >
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDuplicate(item);
-                          }}
-                          className="flex-1 sm:flex-none h-10 rounded-xl hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all"
-                        >
-                          <Copy className="w-4 h-4 sm:mr-0 mr-2" />
-                          <span className="sm:hidden">Duplicate</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(item.id);
-                          }}
-                          className="hover:bg-destructive hover:text-destructive-foreground flex-1 sm:flex-none h-10 rounded-xl border-destructive/20 text-destructive hover:border-destructive transition-all"
-                        >
-                          <Trash2 className="w-4 h-4 sm:mr-0 mr-2" />
-                          <span className="sm:hidden">Delete</span>
-                        </Button>
+                        {selectedItems.includes(item.id) ? (
+                          <div className="w-5 h-5 bg-primary text-primary-foreground rounded-md flex items-center justify-center shadow-sm">
+                            <CheckSquare className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <div className="w-5 h-5 border-2 border-muted-foreground/30 rounded-md hover:border-primary/50 transition-colors group-hover:border-primary/40" />
+                        )}
+                      </div>
+
+                      {/* Content Info */}
+                      <div className="flex-1 min-w-0 space-y-3">
+                        {/* Title and Meta */}
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-lg font-semibold line-clamp-2 hover:text-primary transition-colors mb-2">
+                              {item.title}
+                            </CardTitle>
+                            <div className="flex items-center flex-wrap gap-2">
+                              <Badge className={`${getContentTypeColor(item.content_type)} text-xs px-3 py-1 font-medium`}>
+                                {item.content_type.replace('-', ' ')}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground/80 flex items-center bg-muted/40 px-2 py-1 rounded-lg">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                {format(new Date(item.created_at), 'MMM d')}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {stripHtml(item.content).split(/\s+/).length} words
+                              </span>
+                              {item.source_url && (() => {
+                                try {
+                                  return (
+                                    <span className="text-xs text-muted-foreground truncate">
+                                      {new URL(item.source_url).hostname}
+                                    </span>
+                                  );
+                                } catch {
+                                  return null;
+                                }
+                              })()}
+                            </div>
+                          </div>
+                          
+                          {/* Actions */}
+                          <div className="card-actions flex space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 flex-shrink-0 ml-4">
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectContent(item);
+                              }}
+                              className="btn-accent h-8 px-3"
+                            >
+                              <Edit3 className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDuplicate(item);
+                              }}
+                              className="h-8 px-3 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(item.id);
+                              }}
+                              className="hover:bg-destructive hover:text-destructive-foreground h-8 px-3 border-destructive/20 text-destructive hover:border-destructive transition-all"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Content Preview */}
+                        <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap">
+                          {(() => {
+                            const plainContent = stripHtml(item.content);
+                            return plainContent.length > 200 
+                              ? `${plainContent.substring(0, 200)}...` 
+                              : plainContent;
+                          })()}
+                        </p>
+
+                        {/* Category and Tags Row */}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="inline-editor flex items-center gap-3">
+                            <InlineCategoryEditor
+                              contentId={item.id}
+                              currentCategory={item.category}
+                              availableCategories={categories}
+                              onCategoryChange={(category) => handleCategoryChange(item.id, category)}
+                            />
+                            <InlineTagEditor
+                              contentId={item.id}
+                              currentTags={item.tags || []}
+                              availableTags={tags}
+                              onTagsChange={(newTags) => handleTagsChange(item.id, newTags)}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
-              </Card>
-                ))}
+                </Card>
+              ))}
               </div>
             </>
           )}
