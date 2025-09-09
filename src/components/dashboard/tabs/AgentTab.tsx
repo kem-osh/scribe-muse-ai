@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { callClaudeChat } from '@/lib/claudeUtils';
+import { parseWebhookResponse, createWebhookRequest } from '@/lib/webhookUtils';
 
 interface Message {
   id: string;
@@ -51,28 +51,38 @@ export const AgentTab: React.FC = () => {
     setIsLoading(true);
 
     try {
-      console.log('Sending message to Claude API:', {
+      console.log('Sending message to webhook:', {
         message: input.trim(),
+        type: 'agent_chat',
         conversation_history: messages.slice(-5)
       });
 
-      // Call Claude API directly instead of using webhooks
-      const result = await callClaudeChat({
-        message: input.trim(),
-        conversation_history: messages.slice(-5).map(msg => ({
-          role: msg.role,
-          content: msg.content
-        }))
+      const response = await fetch('https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40', 
+        createWebhookRequest({
+          message: input.trim(),
+          type: 'agent_chat',
+          conversation_history: messages.slice(-5), // Send last 5 messages for context
+        })
+      );
+
+      console.log('Webhook response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
       });
 
-      console.log('Claude API response:', result);
+      const data = await parseWebhookResponse(response);
+      
+      console.log('Parsed webhook data:', data);
 
       // Handle different response types
       let aiContent: string;
-      if (result.error) {
-        aiContent = `I'm sorry, there was an error processing your message: ${result.error}`;
+      if (data.error) {
+        aiContent = `I'm sorry, there was an error processing your message: ${data.error}`;
+      } else if (data.status === 'accepted') {
+        aiContent = data.response || "I've received your message and I'm processing it. Please wait a moment.";
       } else {
-        aiContent = result.response || "I apologize, but I'm having trouble responding right now. Please try again.";
+        aiContent = data.response || "I apologize, but I'm having trouble responding right now. Please try again.";
       }
       
       const aiMessage: Message = {
@@ -84,11 +94,11 @@ export const AgentTab: React.FC = () => {
 
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
-      console.error('Error sending message to Claude API:', error);
+      console.error('Error sending message:', error);
       toast({
         variant: "destructive",
         title: "Connection Error",
-        description: "Failed to send message to Claude AI. Please check your connection and try again.",
+        description: "Failed to send message. Please check your connection and try again.",
       });
       
       // Add error message
@@ -189,8 +199,8 @@ export const AgentTab: React.FC = () => {
         
         <div className="mt-3 flex items-center justify-center text-xs text-muted-foreground">
           <Sparkles className="w-3 h-3 mr-1" />
-          <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line • Powered by Claude AI</span>
-          <span className="sm:hidden">Tap send or use Enter • Claude AI</span>
+          <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line</span>
+          <span className="sm:hidden">Tap send or use Enter</span>
         </div>
       </div>
     </div>

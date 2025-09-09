@@ -11,7 +11,7 @@ import { Sparkles, Loader2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { callClaudeSynthesize } from '@/lib/claudeUtils';
+import { callSynthesizeWebhook } from '@/lib/webhookUtils';
 
 interface Content {
   id: string;
@@ -54,65 +54,79 @@ export const SynthesizeDialog: React.FC<SynthesizeDialogProps> = ({
     setIsLoading(true);
 
     try {
-      // Call Claude API directly instead of using webhooks
-      const result = await callClaudeSynthesize({
+      // Get user's webhook URL or use default
+      let webhookUrl = 'https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40';
+      
+      if (user) {
+        const { data: settings } = await supabase
+          .from('user_settings')
+          .select('webhook_url')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (settings?.webhook_url) {
+          webhookUrl = settings.webhook_url;
+        }
+      }
+
+      const result = await callSynthesizeWebhook(webhookUrl, {
         contents: selectedItems.map(item => ({
           title: item.title,
           content: item.content,
-          content_type: item.content_type,
+          content_type: item.content_type
         })),
         goal,
         tone,
-        target_type: targetType,
+        target_type: targetType
       });
 
       if (result.error) {
         throw new Error(result.error);
       }
 
-      const synthesizedContent = result.synthesized_content || result.response;
+      const synthesizedContent = result.response || result.synthesized_content;
       
-      if (!synthesizedContent) {
-        throw new Error('No synthesized content received from Claude AI');
-      }
+      if (synthesizedContent) {
+        // Save synthesized content to database
+        const { error } = await supabase
+          .from('content')
+          .insert({
+            user_id: user!.id,
+            title,
+            content: synthesizedContent,
+            content_type: targetType,
+            metadata: {
+              synthesized_from: selectedItems.map(item => item.id),
+              synthesis_goal: goal,
+              synthesis_tone: tone
+            }
+          });
 
-      // Save synthesized content to database
-      const { error } = await supabase
-        .from('content')
-        .insert({
-          user_id: user!.id,
-          title,
-          content: synthesizedContent,
-          content_type: targetType,
-          metadata: {
-            synthesized_from: selectedItems.map(item => item.id),
-            synthesis_goal: goal,
-            synthesis_tone: tone
-          }
+        if (error) throw error;
+
+        toast({
+          title: "Content synthesized successfully",
+          description: "Your new content has been created from the selected items.",
         });
 
-      if (error) throw error;
-
-      toast({
-        title: "Content synthesized successfully",
-        description: "Your new content has been created from the selected items using Claude AI.",
-      });
-
-      onSynthesizeComplete();
-      onOpenChange(false);
-      
-      // Reset form
-      setGoal('');
-      setTitle('');
-      setTone('professional');
-      setTargetType('article');
+        onSynthesizeComplete();
+        onOpenChange(false);
+        
+        // Reset form
+        setGoal('');
+        setTitle('');
+        setTone('professional');
+        setTargetType('article');
+      } else {
+        throw new Error('No synthesized content received');
+      }
 
     } catch (error: any) {
-      console.error('Error synthesizing content with Claude AI:', error);
+      console.error('Error synthesizing content:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to synthesize content using Claude AI. Please try again.",
+        description: error.message || "Failed to synthesize content. Please try again.",
       });
     } finally {
       setIsLoading(false);

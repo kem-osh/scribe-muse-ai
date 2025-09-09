@@ -96,32 +96,52 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
     setIsLoading(true);
 
     try {
-      // Import Claude API utilities dynamically to replace webhook calls
-      const { callClaudeEdit } = await import('@/lib/claudeUtils');
+      // Try user's custom webhook first, fallback to default
+      let webhookUrl = 'https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40';
       
-      // Call Claude API directly instead of using webhooks
-      const result = await callClaudeEdit({
-        content: editedContent,
-        title: editedTitle,
-        goal: editGoal,
-        tone: tone || 'professional',
-        content_type: selectedContent.content_type,
-      });
-
-      if (result.error) {
-        throw new Error(result.error);
+      // Check if user has custom webhook URL
+      if (user) {
+        const { data: settings } = await supabase
+          .from('user_settings')
+          .select('webhook_url')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (settings?.webhook_url) {
+          webhookUrl = settings.webhook_url;
+        }
       }
 
-      const editedContentResult = result.edited_content || result.suggestion || result.response;
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'edit_content',
+          content: editedContent,
+          title: editedTitle,
+          goal: editGoal,
+          tone: tone || 'professional',
+          content_type: selectedContent.content_type,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI suggestion');
+      }
+
+      const data = await response.json();
+      const editedContentResult = data.edited_content || data.suggestion || data.response;
       
       if (editedContentResult) {
         setEditedContent(editedContentResult);
         toast({
           title: "Content edited successfully",
-          description: "Your content has been edited using Claude AI.",
+          description: "Your content has been edited using AI.",
         });
       } else {
-        setAiSuggestion(result.suggestion || 'No suggestion available');
+        setAiSuggestion(data.suggestion || 'No suggestion available');
         toast({
           title: "AI suggestion generated",
           description: "Review the suggestion in the panel below.",
@@ -129,11 +149,11 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       }
 
     } catch (error) {
-      console.error('Error getting Claude AI suggestion:', error);
+      console.error('Error getting AI suggestion:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to get Claude AI suggestion. Please try again.",
+        description: "Failed to get AI suggestion. Please try again.",
       });
       setAiSuggestion('Sorry, I could not generate a suggestion at this time. Please try again later.');
     } finally {

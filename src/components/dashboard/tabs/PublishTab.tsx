@@ -153,16 +153,31 @@ export const PublishTab: React.FC = () => {
     setIsPublishing(true);
 
     try {
-      // For publish functionality, we'll record in database but note that external publishing 
-      // would require platform-specific APIs. This is a simplified implementation.
-      console.log('Publishing content:', {
-        title: selectedContent.title,
-        platform: selectedPlatform,
-        contentType: selectedContent.content_type
+      // Send to webhook
+      const response = await fetch('https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'publish',
+          content: previewContent,
+          title: selectedContent.title,
+          platform: selectedPlatform,
+          content_type: selectedContent.content_type,
+          content_id: selectedContent.id,
+          user_id: user.id,
+        }),
       });
 
-      let status = 'published'; // Simplified - would be 'pending' for real integrations
-      let platformId = `${selectedPlatform}_${Date.now()}`; // Mock platform ID
+      let platformId = null;
+      let status = 'pending';
+
+      if (response.ok) {
+        const result = await response.json();
+        platformId = result.platform_id;
+        status = result.status || 'published';
+      }
 
       // Record in database
       const { data, error } = await supabase
@@ -187,7 +202,7 @@ export const PublishTab: React.FC = () => {
 
       toast({
         title: "Content published!",
-        description: `Successfully published to ${platforms.find(p => p.id === selectedPlatform)?.name}. Note: This is a demo - real platform integration would require API keys.`,
+        description: `Successfully published to ${platforms.find(p => p.id === selectedPlatform)?.name}`,
       });
 
       // Reset form
