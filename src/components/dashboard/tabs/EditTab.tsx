@@ -18,7 +18,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { stripHtml, renderForPreview } from '@/lib/utils';
+import { stripHtml, renderForPreview, isLikelyHtml, toHtmlFromPlainText } from '@/lib/utils';
 import { callEditWebhook } from '@/lib/webhookUtils';
 
 interface Content {
@@ -139,7 +139,11 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
         const editedContentResult = result.edited_content || result.response;
         
         if (editedContentResult) {
-          setEditedContent(editedContentResult);
+          // Convert plain text to HTML if needed for proper rich text display
+          const formattedContent = isLikelyHtml(editedContentResult) 
+            ? editedContentResult 
+            : toHtmlFromPlainText(editedContentResult);
+          setEditedContent(formattedContent);
           toast({
             title: "Content edited successfully",
             description: "Your content has been edited using AI.",
@@ -377,7 +381,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
         <div className="h-full px-4 py-2">
           <div className={`grid gap-2 h-full ${
             viewMode === 'split' 
-              ? 'grid-cols-1 xl:grid-cols-2' 
+              ? 'grid-cols-1 lg:grid-cols-2' 
               : 'grid-cols-1'
           }`}>
             {/* Original/Edit Content */}
