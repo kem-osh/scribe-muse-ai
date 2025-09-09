@@ -207,21 +207,27 @@ export const FeedbackTab: React.FC = () => {
 
   return (
     <>
-      {/* Floating Tab */}
-      <div
-        className={`fixed right-0 top-1/2 -translate-y-1/2 z-50 transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-0'
-        }`}
-      >
+      {/* Floating FAB */}
+      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-4 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-3 
-                   rounded-l-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 
-                   active:scale-95 border border-accent/20 hover:border-accent/30"
-          aria-label="Open feedback form"
+          className="group relative w-12 h-12 bg-accent hover:bg-accent/90 text-accent-foreground 
+                   rounded-full shadow-lg hover:shadow-xl transition-all duration-200 
+                   hover:scale-110 active:scale-95 border border-accent/20 hover:border-accent/30
+                   flex items-center justify-center"
+          aria-label="Send feedback"
         >
           <MessageCircle className="w-5 h-5" />
-          <span className="font-medium text-sm">Feedback</span>
+          
+          {/* Tooltip */}
+          <div className="absolute right-full mr-3 px-3 py-2 bg-popover text-popover-foreground 
+                        text-sm rounded-lg shadow-md border border-border opacity-0 invisible
+                        group-hover:opacity-100 group-hover:visible transition-all duration-200
+                        whitespace-nowrap pointer-events-none">
+            Send Feedback
+            <div className="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                          border-l-4 border-l-popover border-y-4 border-y-transparent"></div>
+          </div>
         </button>
       </div>
 
