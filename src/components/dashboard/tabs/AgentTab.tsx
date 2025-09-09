@@ -288,14 +288,42 @@ export const AgentTab: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="chat-input-area p-4 sm:p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-            {/* AI Engine Selection */}
-            <div className="flex items-center space-x-2 sm:space-x-3 sm:min-w-fit">
+      {/* Input - Sticky Bottom Bar */}
+      <div className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-t border-border/50 p-3 sm:p-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Mobile: Model selector above input */}
+          <div className="sm:hidden">
+            <div className="flex items-center space-x-2">
               <Brain className="w-4 h-4 text-primary/60" />
-              <span className="text-sm text-muted-foreground hidden sm:inline">Model:</span>
+              <Select 
+                value={selectedEngine} 
+                onValueChange={setSelectedEngine}
+                disabled={isLoading}
+              >
+                <SelectTrigger className="w-auto h-8 px-3 text-sm border-border/70 focus:border-primary/50 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border shadow-lg z-50">
+                  {ENGINE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {input.trim() && (
+                <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full ml-auto">
+                  {input.trim().split(/\s+/).length}w
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Input Row */}
+          <div className="flex items-end space-x-2 sm:space-x-3">
+            {/* Desktop: Model selector inline */}
+            <div className="hidden sm:flex items-center space-x-2 min-w-fit">
+              <Brain className="w-4 h-4 text-primary/60" />
               <Select 
                 value={selectedEngine} 
                 onValueChange={setSelectedEngine}
@@ -314,47 +342,49 @@ export const AgentTab: React.FC = () => {
               </Select>
             </div>
 
-            {/* Text Input and Send Button */}
-            <div className="flex space-x-3 flex-1">
-              <div className="flex-1 relative">
-                <Textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask me anything about your writing..."
-                  className="input-primary min-h-[80px] sm:min-h-[60px] max-h-[120px] resize-none text-base pr-12 rounded-2xl border-border/70 focus:border-primary/50 shadow-sm"
-                  disabled={isLoading}
-                />
-                <div className="absolute bottom-3 right-3 flex items-center space-x-1">
-                  {input.trim() && (
-                    <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                      {input.trim().split(/\s+/).length} words
-                    </span>
-                  )}
-                </div>
-              </div>
-              <Button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="btn-accent self-end h-12 w-12 sm:w-auto sm:px-6 rounded-xl"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 sm:mr-2" />
-                    <span className="hidden sm:inline">Send</span>
-                  </>
+            {/* Text Input */}
+            <div className="flex-1 relative">
+              <Textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask me anything about your writing..."
+                className="input-primary min-h-[44px] max-h-[100px] resize-none text-sm sm:text-base pr-12 rounded-xl border-border/70 focus:border-primary/50 shadow-sm"
+                disabled={isLoading}
+                rows={1}
+              />
+              {/* Desktop word count */}
+              <div className="absolute bottom-2 right-2 hidden sm:flex items-center">
+                {input.trim() && (
+                  <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
+                    {input.trim().split(/\s+/).length} words
+                  </span>
                 )}
-              </Button>
+              </div>
             </div>
+
+            {/* Send Button */}
+            <Button
+              type="submit"
+              disabled={!input.trim() || isLoading}
+              className="btn-accent h-[44px] w-[44px] sm:w-auto sm:px-4 rounded-xl flex-shrink-0"
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Send className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Send</span>
+                </>
+              )}
+            </Button>
           </div>
           
-          <div className="flex items-center justify-center text-xs text-muted-foreground/70">
-            <Sparkles className="w-3 h-3 mr-1 text-primary/60" />
-            <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line</span>
-            <span className="sm:hidden">Tap send or use Enter</span>
+          {/* Helper text - desktop only */}
+          <div className="hidden sm:flex items-center justify-center text-xs text-muted-foreground/60">
+            <Sparkles className="w-3 h-3 mr-1 text-primary/50" />
+            <span>Press Enter to send, Shift+Enter for new line</span>
           </div>
         </form>
       </div>
