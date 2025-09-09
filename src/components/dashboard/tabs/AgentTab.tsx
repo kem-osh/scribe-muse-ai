@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Loader2, Sparkles } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Send, Loader2, Sparkles, Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { parseWebhookResponse, createWebhookRequest } from '@/lib/webhookUtils';
 
@@ -11,6 +12,19 @@ interface Message {
   role: 'user' | 'assistant';
   timestamp: Date;
 }
+
+interface EngineOption {
+  value: string;
+  label: string;
+}
+
+const ENGINE_OPTIONS: EngineOption[] = [
+  { value: 'agent', label: 'Agent' },
+  { value: 'perplexity-sonar-pro', label: 'Perplexity Sonar Pro' },
+  { value: 'claude-sonnet-4', label: 'Claude Sonnet 4' },
+  { value: 'deepseek-r1', label: 'Deepseek R1' },
+  { value: 'gpt-5', label: 'GPT 5' },
+];
 
 export const AgentTab: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -23,9 +37,17 @@ export const AgentTab: React.FC = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedEngine, setSelectedEngine] = useState<string>(() => {
+    return localStorage.getItem('agentChatEngine') || 'agent';
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
+
+  // Persist engine selection to localStorage
+  useEffect(() => {
+    localStorage.setItem('agentChatEngine', selectedEngine);
+  }, [selectedEngine]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -54,6 +76,7 @@ export const AgentTab: React.FC = () => {
       console.log('Sending message to webhook:', {
         message: input.trim(),
         type: 'agent_chat',
+        engine: selectedEngine,
         conversation_history: messages.slice(-5)
       });
 
@@ -61,6 +84,7 @@ export const AgentTab: React.FC = () => {
         createWebhookRequest({
           message: input.trim(),
           type: 'agent_chat',
+          engine: selectedEngine,
           conversation_history: messages.slice(-5), // Send last 5 messages for context
         })
       );
@@ -167,6 +191,28 @@ export const AgentTab: React.FC = () => {
       {/* Input */}
       <div className="chat-input-area p-4 sm:p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* AI Engine Selection */}
+          <div className="flex items-center space-x-3">
+            <Brain className="w-4 h-4 text-primary/60" />
+            <span className="text-sm text-muted-foreground">Model:</span>
+            <Select 
+              value={selectedEngine} 
+              onValueChange={setSelectedEngine}
+              disabled={isLoading}
+            >
+              <SelectTrigger className="w-auto h-8 px-3 text-sm border-border/70 focus:border-primary/50 bg-background">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-background border border-border shadow-lg z-50">
+                {ENGINE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
           <div className="flex space-x-3">
             <div className="flex-1 relative">
               <Textarea
