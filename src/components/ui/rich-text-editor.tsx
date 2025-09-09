@@ -40,6 +40,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const quillRef = useRef<any>(null);
 
+  // Debug: log what ReactQuill receives
+  useEffect(() => {
+    try {
+      console.debug('RichTextEditor received value:', (value || '').slice(0, 200));
+    } catch {}
+  }, [value]);
+
   // Load Quill CSS
   useEffect(() => {
     const loadQuillCSS = () => {

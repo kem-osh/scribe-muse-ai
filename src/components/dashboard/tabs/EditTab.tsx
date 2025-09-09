@@ -47,13 +47,23 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  // Normalize any plain text into Quill-friendly HTML
+  const normalizeForEditor = (text: string) => (
+    isLikelyHtml(text) ? text : toHtmlFromPlainText(text)
+  );
+
   // Check if there are unsaved changes
   const hasUnsavedChanges = editedContent !== originalContent || editedTitle !== selectedContent?.title;
 
   useEffect(() => {
     if (selectedContent) {
-      setOriginalContent(selectedContent.content);
-      setEditedContent(selectedContent.content);
+      const normalized = normalizeForEditor(selectedContent.content || '');
+      console.debug('EditTab: loading selectedContent', {
+        isHtml: isLikelyHtml(selectedContent.content || ''),
+        snippet: (selectedContent.content || '').slice(0, 120)
+      });
+      setOriginalContent(normalized);
+      setEditedContent(normalized);
       setEditedTitle(selectedContent.title);
       setAiSuggestion('');
     }
@@ -83,6 +93,13 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [editedContent, originalContent, editedTitle, selectedContent?.title]);
+
+  // Debug: what is being passed to ReactQuill
+  useEffect(() => {
+    try {
+      console.debug('EditTab -> editedContent snippet:', editedContent.slice(0, 200), 'isHtml:', isLikelyHtml(editedContent));
+    } catch {}
+  }, [editedContent]);
 
   const handleAISuggestion = async () => {
     if (!selectedContent || !editGoal.trim()) {
@@ -177,8 +194,10 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
 
   const handleApplySuggestion = () => {
     if (aiSuggestion) {
-      setEditedContent(aiSuggestion);
+      const formatted = normalizeForEditor(aiSuggestion);
+      setEditedContent(formatted);
       setAiSuggestion('');
+      console.debug('Applied AI suggestion, isHtml:', isLikelyHtml(aiSuggestion));
       toast({
         title: "Suggestion applied",
         description: "The AI suggestion has been applied to your content.",
