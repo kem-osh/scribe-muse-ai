@@ -401,8 +401,8 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-3 sm:p-4 lg:p-6">
-      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+    <div className="h-full overflow-y-auto p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4 mb-2">
           <div className="relative inline-block">
@@ -437,7 +437,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Search */}
               <div className="relative sm:col-span-2 lg:col-span-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -445,16 +445,16 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                   placeholder="Search content..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-primary pl-10 h-11 sm:h-12 text-base"
+                  className="input-primary pl-10 h-12 text-base"
                 />
               </div>
 
               {/* Type Filter */}
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="input-primary h-11 sm:h-12">
-                  <SelectValue placeholder="Type" />
+                <SelectTrigger className="input-primary h-12">
+                  <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
-                <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
+                <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="article">Article</SelectItem>
                   <SelectItem value="blog-post">Blog Post</SelectItem>
@@ -468,10 +468,10 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
 
               {/* Category Filter */}
               <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="input-primary h-11 sm:h-12">
-                  <SelectValue placeholder="Category" />
+                <SelectTrigger className="input-primary h-12">
+                  <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
-                <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
+                <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
@@ -489,15 +489,15 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
 
               {/* Tag Filter */}
               <Select value={filterTag} onValueChange={setFilterTag}>
-                <SelectTrigger className="input-primary h-11 sm:h-12">
-                  <SelectValue placeholder="Tag" />
+                <SelectTrigger className="input-primary h-12">
+                  <SelectValue placeholder="Filter by tag" />
                 </SelectTrigger>
-                <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
+                <SelectContent>
                   <SelectItem value="all">All Tags</SelectItem>
                   {tags.map((tag) => (
                     <SelectItem key={tag.id} value={tag.id}>
                       <div className="flex items-center space-x-2">
-                        <div
+                        <div 
                           className="w-3 h-3 rounded"
                           style={{ backgroundColor: tag.color }}
                         />
@@ -510,10 +510,10 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
 
               {/* Sort */}
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="input-primary h-11 sm:h-12">
-                  <SelectValue placeholder="Sort" />
+                <SelectTrigger className="input-primary h-12">
+                  <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
-                <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
+                <SelectContent>
                   <SelectItem value="created_desc">Newest First</SelectItem>
                   <SelectItem value="created_asc">Oldest First</SelectItem>
                   <SelectItem value="updated_desc">Recently Updated</SelectItem>
@@ -525,38 +525,36 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
 
             {/* Bulk Actions */}
             {selectedItems.length > 0 && (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-accent/10 rounded-lg border border-accent/20 gap-2 sm:gap-0">
+              <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg border border-accent/20">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm font-medium">
                     {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
                   </span>
                 </div>
-                <div className="flex items-center space-x-2 w-full sm:w-auto">
+                <div className="flex items-center space-x-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={handleExportContent}
-                    className="flex-1 sm:flex-none"
                   >
-                    <Download className="w-4 h-4 sm:mr-2" />
-                    <span className="sm:inline">Export</span>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
                   </Button>
                   <Button
                     size="sm"
                     onClick={() => setShowSynthesizeDialog(true)}
-                    className="btn-accent flex-1 sm:flex-none"
+                    className="btn-accent"
                   >
-                    <Sparkles className="w-4 h-4 sm:mr-2" />
-                    <span className="sm:inline">Synthesize</span>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Synthesize
                   </Button>
                   <Button
                     size="sm"
                     variant="destructive"
                     onClick={handleBulkDelete}
-                    className="flex-1 sm:flex-none"
                   >
-                    <Trash2 className="w-4 h-4 sm:mr-2" />
-                    <span className="sm:inline">Delete</span>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
                   </Button>
                 </div>
               </div>
@@ -580,7 +578,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
         ) : (
           <>
             {/* Select All Checkbox */}
-            <div className="flex items-center justify-between mb-3 sm:mb-4 px-1">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   checked={content.length > 0 && selectedItems.length === content.length}
@@ -592,11 +590,11 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
               </div>
             </div>
 
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4">
               {content.map((item) => (
                 <Card 
                   key={item.id} 
-                  className={`content-card group cursor-pointer relative transition-all duration-200 hover:scale-[1.005] ${
+                  className={`content-card group cursor-pointer relative ${
                     selectedItems.includes(item.id) ? 'content-card-selected' : ''
                   }`}
                   onClick={(e) => {
@@ -604,15 +602,15 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                     onSelectContent(item);
                   }}
                 >
-                  <CardContent className="p-3 sm:p-4 lg:p-6">
-                    <div className="flex gap-3 sm:gap-4">
+                  <CardContent className="p-6">
+                    <div className="flex gap-4">
                       {/* Selection Checkbox */}
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSelectItem(item.id);
                         }}
-                        className="cursor-pointer flex-shrink-0 mt-1 touch-manipulation"
+                        className="cursor-pointer flex-shrink-0 mt-1"
                       >
                         {selectedItems.includes(item.id) ? (
                           <div className="w-5 h-5 bg-primary text-primary-foreground rounded-md flex items-center justify-center shadow-sm">
@@ -624,18 +622,18 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                       </div>
 
                       {/* Content Info */}
-                      <div className="flex-1 min-w-0 space-y-2 sm:space-y-3">
+                      <div className="flex-1 min-w-0 space-y-3">
                         {/* Title and Meta */}
-                        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-2 lg:gap-4">
+                        <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-base sm:text-lg font-semibold line-clamp-2 hover:text-primary transition-colors mb-1 sm:mb-2">
+                            <CardTitle className="text-lg font-semibold line-clamp-2 hover:text-primary transition-colors mb-2">
                               {item.title}
                             </CardTitle>
-                            <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
-                              <Badge className={`${getContentTypeColor(item.content_type)} text-xs px-2 sm:px-3 py-1 font-medium`}>
+                            <div className="flex items-center flex-wrap gap-2">
+                              <Badge className={`${getContentTypeColor(item.content_type)} text-xs px-3 py-1 font-medium`}>
                                 {item.content_type.replace('-', ' ')}
                               </Badge>
-                              <span className="text-xs text-muted-foreground/80 flex items-center bg-muted/40 px-1.5 sm:px-2 py-1 rounded-lg">
+                              <span className="text-xs text-muted-foreground/80 flex items-center bg-muted/40 px-2 py-1 rounded-lg">
                                 <Calendar className="w-3 h-3 mr-1" />
                                 {format(new Date(item.created_at), 'MMM d')}
                               </span>
@@ -645,7 +643,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                               {item.source_url && (() => {
                                 try {
                                   return (
-                                    <span className="text-xs text-muted-foreground truncate max-w-[120px]">
+                                    <span className="text-xs text-muted-foreground truncate">
                                       {new URL(item.source_url).hostname}
                                     </span>
                                   );
@@ -657,17 +655,17 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                           </div>
                           
                           {/* Actions */}
-                          <div className="card-actions flex flex-row lg:flex-col xl:flex-row space-x-1 lg:space-x-0 lg:space-y-1 xl:space-y-0 xl:space-x-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all duration-300 flex-shrink-0">
+                          <div className="card-actions flex space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 flex-shrink-0 ml-4">
                             <Button
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onSelectContent(item);
                               }}
-                              className="btn-accent h-8 px-2 sm:px-3 text-xs"
+                              className="btn-accent h-8 px-3"
                             >
-                              <Edit3 className="w-3 sm:w-4 h-3 sm:h-4 sm:mr-1" />
-                              <span className="hidden sm:inline">Edit</span>
+                              <Edit3 className="w-4 h-4 mr-1" />
+                              Edit
                             </Button>
                             <Button
                               size="sm"
@@ -676,9 +674,9 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                                 e.stopPropagation();
                                 handleDuplicate(item);
                               }}
-                              className="h-8 px-2 sm:px-3 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all"
+                              className="h-8 px-3 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all"
                             >
-                              <Copy className="w-3 sm:w-4 h-3 sm:h-4" />
+                              <Copy className="w-4 h-4" />
                             </Button>
                             <Button
                               size="sm"
@@ -687,26 +685,26 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                                 e.stopPropagation();
                                 handleDelete(item.id);
                               }}
-                              className="hover:bg-destructive hover:text-destructive-foreground h-8 px-2 sm:px-3 border-destructive/20 text-destructive hover:border-destructive transition-all"
+                              className="hover:bg-destructive hover:text-destructive-foreground h-8 px-3 border-destructive/20 text-destructive hover:border-destructive transition-all"
                             >
-                              <Trash2 className="w-3 sm:w-4 h-3 sm:h-4" />
+                              <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
                         </div>
 
                         {/* Content Preview */}
-                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap leading-relaxed">
+                        <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap">
                           {(() => {
                             const plainContent = stripHtml(item.content);
-                            return plainContent.length > 150 
-                              ? `${plainContent.substring(0, 150)}...` 
+                            return plainContent.length > 200 
+                              ? `${plainContent.substring(0, 200)}...` 
                               : plainContent;
                           })()}
                         </p>
 
                         {/* Category and Tags Row */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-                          <div className="inline-editor flex items-center flex-wrap gap-2 sm:gap-3">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="inline-editor flex items-center gap-3">
                             <InlineCategoryEditor
                               contentId={item.id}
                               currentCategory={item.category}

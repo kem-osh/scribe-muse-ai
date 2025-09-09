@@ -208,22 +208,22 @@ export const FeedbackTab: React.FC = () => {
   return (
     <>
       {/* Floating Tab */}
-        <div
-          className={`fixed right-0 top-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${
-            isOpen ? 'translate-x-0' : 'translate-x-0'
-          }`}
+      <div
+        className={`fixed right-0 top-1/2 -translate-y-1/2 z-50 transition-transform duration-300 ${
+          isOpen ? 'translate-x-0' : 'translate-x-0'
+        }`}
+      >
+        <button
+          onClick={() => setIsOpen(true)}
+          className="flex items-center gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-3 
+                   rounded-l-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 
+                   active:scale-95 border border-accent/20 hover:border-accent/30"
+          aria-label="Open feedback form"
         >
-          <button
-            onClick={() => setIsOpen(true)}
-            className="flex items-center gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-3 sm:px-4 py-2 sm:py-3 
-                     rounded-l-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 
-                     active:scale-95 border border-accent/20 hover:border-accent/30 touch-manipulation"
-            aria-label="Open feedback form"
-          >
-            <MessageCircle className="w-4 sm:w-5 h-4 sm:h-5" />
-            <span className="font-medium text-xs sm:text-sm">Feedback</span>
-          </button>
-        </div>
+          <MessageCircle className="w-5 h-5" />
+          <span className="font-medium text-sm">Feedback</span>
+        </button>
+      </div>
 
       {/* Overlay */}
       {isOpen && (
@@ -234,12 +234,12 @@ export const FeedbackTab: React.FC = () => {
       )}
 
       {/* Feedback Panel */}
-        <div
-          className={`fixed right-0 top-0 h-full w-full max-w-[400px] sm:w-[400px] bg-background border-l border-border 
-                     shadow-2xl z-50 transition-transform duration-300 ease-out ${
-            isOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        >
+      <div
+        className={`fixed right-0 top-0 h-full w-full sm:w-[400px] bg-background border-l border-border 
+                   shadow-2xl z-50 transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">

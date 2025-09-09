@@ -49,9 +49,9 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
           </div>
         </div>
 
-        {/* Desktop Tab Navigation */}
-        <div className="flex-1 max-w-3xl mx-4 lg:mx-6 hidden md:block">
-          <div className="flex justify-center bg-muted/50 rounded-2xl p-1 backdrop-blur-sm border border-border/50 shadow-sm">
+        {/* Tab Navigation */}
+        <div className="flex-1 max-w-3xl mx-6 hidden md:block">
+          <div className="flex justify-center bg-muted/30 rounded-2xl p-1 backdrop-blur-sm border border-border/50">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -60,7 +60,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex items-center justify-center space-x-2 flex-1 min-h-[44px] px-3 lg:px-4 py-2 relative z-10 transition-all duration-200`}
+                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex items-center justify-center space-x-2 flex-1 min-h-[44px] px-4 py-2 relative z-10`}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="text-sm font-medium">{tab.label}</span>
@@ -71,8 +71,8 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
         </div>
 
         {/* Mobile Tab Navigation */}
-        <div className="md:hidden flex-1 max-w-xs mx-3">
-          <div className="flex bg-muted/50 rounded-xl p-0.5 shadow-sm border border-border/30">
+        <div className="md:hidden flex-1 max-w-md mx-4">
+          <div className="flex bg-muted/30 rounded-xl p-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -81,10 +81,10 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col items-center justify-center space-y-0.5 flex-1 min-h-[52px] px-1 py-1.5 transition-all duration-200 rounded-lg`}
+                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col items-center justify-center space-y-1 flex-1 min-h-[48px] px-1 py-2`}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="text-[10px] font-medium leading-tight">{tab.label}</span>
+                  <span className="text-xs font-medium">{tab.label}</span>
                 </button>
               );
             })}

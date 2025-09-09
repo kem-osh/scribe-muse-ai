@@ -257,8 +257,8 @@ export const PublishTab: React.FC = () => {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-3 sm:p-4 lg:p-6">
-      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+    <div className="h-full overflow-y-auto p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4 mb-2">
           <div className="relative inline-block">
@@ -288,10 +288,10 @@ export const PublishTab: React.FC = () => {
                     setSelectedContent(content || null);
                   }}
                 >
-                  <SelectTrigger className="input-primary h-11 sm:h-12 bg-background/95 backdrop-blur-sm">
+                  <SelectTrigger className="input-primary h-12">
                     <SelectValue placeholder="Choose content to publish" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
+                  <SelectContent>
                     {userContent.map((content) => (
                       <SelectItem key={content.id} value={content.id}>
                         <div className="flex items-center space-x-2">
@@ -323,17 +323,17 @@ export const PublishTab: React.FC = () => {
                         <div
                           key={platform.id}
                           onClick={() => setSelectedPlatform(platform.id)}
-                          className={`p-3 sm:p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                          className={`p-4 rounded-xl border cursor-pointer transition-all ${
                             isSelected
-                              ? 'border-accent bg-accent/5 shadow-sm'
+                              ? 'border-accent bg-accent/5'
                               : 'border-border hover:border-accent/50'
                           }`}
                         >
                           <div className="flex items-center space-x-3">
-                            <Icon className="w-5 sm:w-6 h-5 sm:h-6 text-accent flex-shrink-0" />
+                            <Icon className="w-6 h-6 text-accent flex-shrink-0" />
                             <div className="min-w-0 flex-1">
-                              <h4 className="font-medium text-sm sm:text-base">{platform.name}</h4>
-                              <p className="text-xs sm:text-sm text-muted-foreground">
+                              <h4 className="font-medium">{platform.name}</h4>
+                              <p className="text-sm text-muted-foreground">
                                 {platform.description}
                               </p>
                             </div>
@@ -373,7 +373,7 @@ export const PublishTab: React.FC = () => {
                     <Button
                       onClick={handlePublish}
                       disabled={isPublishing}
-                      className="btn-accent h-11 sm:h-10 w-full sm:w-auto px-6"
+                      className="btn-accent h-12 sm:h-auto w-full sm:w-auto"
                     >
                       {isPublishing ? (
                         <>

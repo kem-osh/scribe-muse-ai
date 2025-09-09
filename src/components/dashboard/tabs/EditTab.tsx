@@ -276,9 +276,9 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
     <div className="h-full flex flex-col">
       {/* Compact Header */}
       <div className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur-sm">
-        <div className="px-3 sm:px-4 py-2">
+        <div className="px-4 py-2">
           {/* First row: Title, View Mode, Actions */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-2">
+          <div className="flex items-center justify-between gap-4 mb-2">
             <div className="flex items-center space-x-2 min-w-0">
               <h2 className="text-lg font-bold text-foreground">Edit Content</h2>
               {hasUnsavedChanges && (
@@ -290,10 +290,10 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
             
             <div className="flex items-center gap-2 shrink-0">
               <Select value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
-                <SelectTrigger className="w-28 h-8 text-xs bg-background/95 backdrop-blur-sm">
+                <SelectTrigger className="w-28 h-8">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
+                <SelectContent>
                   <SelectItem value="split">Split</SelectItem>
                   <SelectItem value="edit">Edit</SelectItem>
                   <SelectItem value="preview">Preview</SelectItem>
@@ -305,23 +305,23 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
                 disabled={!hasUnsavedChanges}
                 variant="outline"
                 size="sm"
-                className="h-8 px-3 text-xs"
+                className="h-8 px-3"
               >
-                <RotateCcw className="w-3 h-3 sm:mr-1" />
-                <span className="hidden sm:inline">Reset</span>
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Reset
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges || isSaving}
-                className="btn-primary h-8 px-3 text-xs"
+                className="btn-primary h-8 px-3"
                 size="sm"
               >
                 {isSaving ? (
                   <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                 ) : (
-                  <Save className="w-3 h-3 sm:mr-1" />
+                  <Save className="w-3 h-3 mr-1" />
                 )}
-                <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save'}</span>
+                {isSaving ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </div>
@@ -335,55 +335,51 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
           />
 
           {/* Third row: AI Assistant - Compact */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs">
             <div className="flex items-center gap-1 text-accent">
               <Sparkles className="w-3 h-3" />
               <span className="font-medium">AI:</span>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 flex-1 w-full">
-              <Input
-                value={editGoal}
-                onChange={(e) => setEditGoal(e.target.value)}
-                placeholder="Editing goal..."
-                className="input-primary h-7 text-xs flex-1"
-              />
-              <div className="flex gap-2">
-                <Select value={tone} onValueChange={setTone}>
-                  <SelectTrigger className="input-primary h-7 w-28 text-xs bg-background/95 backdrop-blur-sm">
-                    <SelectValue placeholder="Tone" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]">
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
-                    <SelectItem value="formal">Formal</SelectItem>
-                    <SelectItem value="conversational">Conversational</SelectItem>
-                    <SelectItem value="persuasive">Persuasive</SelectItem>
-                    <SelectItem value="educational">Educational</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button
-                  onClick={handleAISuggestion}
-                  disabled={isLoading || !editGoal.trim()}
-                  className="btn-accent h-7 px-2 text-xs"
-                  size="sm"
-                >
-                  {isLoading ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-3 h-3" />
-                  )}
-                </Button>
-                {aiSuggestion && (
-                  <Button
-                    size="sm"
-                    onClick={handleApplySuggestion}
-                    className="btn-accent h-7 px-2 text-xs"
-                  >
-                    Apply
-                  </Button>
-                )}
-              </div>
-            </div>
+            <Input
+              value={editGoal}
+              onChange={(e) => setEditGoal(e.target.value)}
+              placeholder="Editing goal..."
+              className="input-primary h-7 text-xs flex-1"
+            />
+            <Select value={tone} onValueChange={setTone}>
+              <SelectTrigger className="input-primary h-7 w-24 text-xs">
+                <SelectValue placeholder="Tone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="professional">Professional</SelectItem>
+                <SelectItem value="casual">Casual</SelectItem>
+                <SelectItem value="formal">Formal</SelectItem>
+                <SelectItem value="conversational">Conversational</SelectItem>
+                <SelectItem value="persuasive">Persuasive</SelectItem>
+                <SelectItem value="educational">Educational</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleAISuggestion}
+              disabled={isLoading || !editGoal.trim()}
+              className="btn-accent h-7 px-2 text-xs"
+              size="sm"
+            >
+              {isLoading ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3" />
+              )}
+            </Button>
+            {aiSuggestion && (
+              <Button
+                size="sm"
+                onClick={handleApplySuggestion}
+                className="btn-accent h-7 px-2 text-xs"
+              >
+                Apply
+              </Button>
+            )}
           </div>
           
           {/* AI Suggestion - Collapsible */}
@@ -396,9 +392,9 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       </div>
 
       {/* Content Editor - Maximum space (75%+ of viewport) */}
-      <div className="flex-1 min-h-0" style={{ minHeight: '70vh' }}>
-        <div className="h-full px-3 sm:px-4 py-2">
-          <div className={`grid gap-2 sm:gap-3 h-full ${
+      <div className="flex-1 min-h-0" style={{ minHeight: '75vh' }}>
+        <div className="h-full px-4 py-2">
+          <div className={`grid gap-2 h-full ${
             viewMode === 'split' 
               ? 'grid-cols-1 lg:grid-cols-2' 
               : 'grid-cols-1'
