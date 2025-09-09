@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Send, Loader2, Sparkles, Brain } from 'lucide-react';
+import { Send, Loader2, Sparkles, Brain, Copy, BookPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { parseWebhookResponse, createWebhookRequest } from '@/lib/webhookUtils';
 
 interface Message {
@@ -40,9 +42,12 @@ export const AgentTab: React.FC = () => {
   const [selectedEngine, setSelectedEngine] = useState<string>(() => {
     return localStorage.getItem('agentChatEngine') || 'agent';
   });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Persist engine selection to localStorage
   useEffect(() => {
@@ -145,6 +150,63 @@ export const AgentTab: React.FC = () => {
     }
   };
 
+  const handleCopyReply = async (messageId: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedId(messageId);
+      toast({
+        title: "Copied!",
+        description: "Reply copied to clipboard",
+      });
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Copy failed",
+        description: "Unable to copy to clipboard",
+      });
+    }
+  };
+
+  const handleSaveReply = async (messageId: string, content: string) => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Authentication required",
+        description: "Please sign in to save to library",
+      });
+      return;
+    }
+
+    setSavingId(messageId);
+    try {
+      const { error } = await supabase
+        .from('content')
+        .insert({
+          title: `Agent Reply - ${new Date().toLocaleDateString()}`,
+          content: content,
+          content_type: 'agent_reply',
+          user_id: user.id,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Saved!",
+        description: "Reply saved to your library",
+      });
+    } catch (error) {
+      console.error('Error saving to library:', error);
+      toast({
+        variant: "destructive",
+        title: "Save failed",
+        description: "Unable to save to library",
+      });
+    } finally {
+      setSavingId(null);
+    }
+  };
+
   return (
     <div className="chat-container h-full">
       {/* Messages */}
@@ -160,15 +222,45 @@ export const AgentTab: React.FC = () => {
               } max-w-[90%] sm:max-w-[85%]`}
             >
               <div className="whitespace-pre-wrap text-sm sm:text-base leading-relaxed">{message.content}</div>
-              <div
-                className={`text-xs mt-2 ${
-                  message.role === 'user' ? 'text-accent-foreground/70' : 'text-muted-foreground'
-                }`}
-              >
-                {message.timestamp.toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+              <div className="flex items-center justify-between mt-2">
+                <div
+                  className={`text-xs ${
+                    message.role === 'user' ? 'text-accent-foreground/70' : 'text-muted-foreground'
+                  }`}
+                >
+                  {message.timestamp.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </div>
+                {message.role === 'assistant' && (
+                  <div className="flex items-center space-x-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-muted/50"
+                      onClick={() => handleCopyReply(message.id, message.content)}
+                      disabled={copiedId === message.id}
+                      title="Copy reply"
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-muted/50"
+                      onClick={() => handleSaveReply(message.id, message.content)}
+                      disabled={savingId === message.id}
+                      title="Save to library"
+                    >
+                      {savingId === message.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <BookPlus className="w-3 h-3" />
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
