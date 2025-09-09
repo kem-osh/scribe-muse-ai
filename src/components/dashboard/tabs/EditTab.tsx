@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { stripHtml, renderForPreview } from '@/lib/utils';
+import { callEditWebhook } from '@/lib/webhookUtils';
 
 interface Content {
   id: string;
@@ -112,40 +113,49 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
         }
       }
 
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'edit_content',
-          content: editedContent,
-          title: editedTitle,
-          goal: editGoal,
-          tone: tone || 'professional',
-          content_type: selectedContent.content_type,
-        }),
+      const result = await callEditWebhook(webhookUrl, {
+        content: editedContent,
+        title: editedTitle,
+        goal: editGoal,
+        tone: tone || 'professional',
+        content_type: selectedContent.content_type,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get AI suggestion');
-      }
+      console.log('AI suggestion result:', { status: result.status, hasError: !!result.error, hasEditedContent: !!result.edited_content, hasSuggestion: !!result.suggestion });
 
-      const data = await response.json();
-      const editedContentResult = data.edited_content || data.suggestion || data.response;
-      
-      if (editedContentResult) {
-        setEditedContent(editedContentResult);
+      if (result.error) {
         toast({
-          title: "Content edited successfully",
-          description: "Your content has been edited using AI.",
+          variant: "destructive",
+          title: "Error",
+          description: result.error,
+        });
+        setAiSuggestion('Sorry, I could not generate a suggestion at this time. Please try again later.');
+      } else if (result.status === 'accepted') {
+        toast({
+          title: "Request accepted",
+          description: "Your request is being processed. Please wait a moment.",
         });
       } else {
-        setAiSuggestion(data.suggestion || 'No suggestion available');
-        toast({
-          title: "AI suggestion generated",
-          description: "Review the suggestion in the panel below.",
-        });
+        const editedContentResult = result.edited_content || result.response;
+        
+        if (editedContentResult) {
+          setEditedContent(editedContentResult);
+          toast({
+            title: "Content edited successfully",
+            description: "Your content has been edited using AI.",
+          });
+        } else if (result.suggestion) {
+          setAiSuggestion(result.suggestion);
+          toast({
+            title: "AI suggestion generated",
+            description: "Review the suggestion in the panel below.",
+          });
+        } else {
+          toast({
+            title: "No suggestion available",
+            description: "The AI did not return any suggestions for your content.",
+          });
+        }
       }
 
     } catch (error) {
