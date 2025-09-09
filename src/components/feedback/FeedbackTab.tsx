@@ -265,8 +265,8 @@ export const FeedbackTab: React.FC = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-6 space-y-6">
               
               {/* Feedback Type */}
               <div className="space-y-3">
