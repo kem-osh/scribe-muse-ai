@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { parseWebhookResponse, createWebhookRequest } from '@/lib/webhookUtils';
+import { renderForPreview } from '@/lib/utils';
 
 interface Message {
   id: string;
@@ -221,7 +222,14 @@ export const AgentTab: React.FC = () => {
                 message.role === 'user' ? 'chat-message-user' : 'chat-message-ai'
               } max-w-[90%] sm:max-w-[85%]`}
             >
-              <div className="whitespace-pre-wrap text-sm sm:text-base leading-relaxed">{message.content}</div>
+              {message.role === 'assistant' ? (
+                <div 
+                  className="rich-content text-sm sm:text-base leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: renderForPreview(message.content) }}
+                />
+              ) : (
+                <div className="whitespace-pre-wrap text-sm sm:text-base leading-relaxed">{message.content}</div>
+              )}
               <div className="flex items-center justify-between mt-2">
                 <div
                   className={`text-xs ${
