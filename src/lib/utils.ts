@@ -38,14 +38,57 @@ export function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html);
 }
 
-// Check if content is likely HTML (has HTML tags that aren't just escaped)
+// Check if content is likely HTML (has HTML tags)
 export function isLikelyHtml(content: string): boolean {
-  // More comprehensive HTML detection
-  const htmlTags = /<(?!\/?\s*(?:br|p)\s*\/?>)[a-z][\s\S]*?>/i;
-  const hasActualTags = htmlTags.test(content);
+  // Look for actual HTML tags (opening or closing)
+  const htmlTagPattern = /<\/?[a-z][a-z0-9]*[^<>]*>/i;
+  return htmlTagPattern.test(content);
+}
+
+// Check if content looks like Markdown
+export function looksLikeMarkdown(content: string): boolean {
+  // Look for common Markdown patterns
+  const markdownPatterns = [
+    /^#{1,6}\s+/m,           // Headings (# ## ### etc)
+    /^\*\s+/m,               // Unordered list with *
+    /^-\s+/m,                // Unordered list with -
+    /^\d+\.\s+/m,            // Ordered list
+    /\*\*[^*]+\*\*/,         // Bold text
+    /\*[^*]+\*/,             // Italic text
+    /`[^`]+`/,               // Inline code
+    /^```/m,                 // Code blocks
+    /^\>/m,                  // Blockquotes
+  ];
   
-  // If it has more than just basic tags or has attributes, it's likely HTML
-  return hasActualTags || /<[a-z]+\s+[^>]*>/i.test(content);
+  return markdownPatterns.some(pattern => pattern.test(content));
+}
+
+// Convert basic Markdown to HTML
+export function simpleMarkdownToHtml(markdown: string): string {
+  if (!markdown) return '';
+  
+  let html = markdown;
+  
+  // Convert headers (# ## ### etc)
+  html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+  
+  // Convert bold and italic
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  
+  // Convert inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+  // Convert line breaks to paragraphs
+  const paragraphs = html.split(/\n\s*\n/);
+  html = paragraphs
+    .filter(p => p.trim())
+    .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
+    .join('');
+  
+  return html;
 }
 
 // Escape HTML entities in plain text
@@ -78,16 +121,26 @@ export function toHtmlFromPlainText(text: string): string {
     .join('');
 }
 
-// Main function to render content for preview (handles both HTML and plain text)
-export function renderForPreview(content: string): string {
+// Convert any content type to HTML for rich text editing
+export function toHtmlFromContent(content: string): string {
   if (!content) return '';
   
   if (isLikelyHtml(content)) {
-    // Content appears to be HTML, just sanitize it
-    return sanitizeHtml(content);
+    // Already HTML, just return it
+    return content;
+  } else if (looksLikeMarkdown(content)) {
+    // Convert Markdown to HTML
+    return simpleMarkdownToHtml(content);
   } else {
-    // Content is plain text, convert to HTML with proper formatting
-    const htmlContent = toHtmlFromPlainText(content);
-    return sanitizeHtml(htmlContent);
+    // Plain text, convert to HTML with proper formatting
+    return toHtmlFromPlainText(content);
   }
+}
+
+// Main function to render content for preview (handles HTML, Markdown, and plain text)
+export function renderForPreview(content: string): string {
+  if (!content) return '';
+  
+  const htmlContent = toHtmlFromContent(content);
+  return sanitizeHtml(htmlContent);
 }

@@ -18,7 +18,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { stripHtml, renderForPreview, isLikelyHtml, toHtmlFromPlainText } from '@/lib/utils';
+import { stripHtml, renderForPreview, toHtmlFromContent } from '@/lib/utils';
 import { callEditWebhook } from '@/lib/webhookUtils';
 
 interface Content {
@@ -47,10 +47,8 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Normalize any plain text into Quill-friendly HTML
-  const normalizeForEditor = (text: string) => (
-    isLikelyHtml(text) ? text : toHtmlFromPlainText(text)
-  );
+  // Normalize any content (HTML, Markdown, or plain text) into Quill-friendly HTML
+  const normalizeForEditor = (text: string) => toHtmlFromContent(text);
 
   // Check if there are unsaved changes
   const hasUnsavedChanges = editedContent !== originalContent || editedTitle !== selectedContent?.title;
@@ -59,8 +57,8 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
     if (selectedContent) {
       const normalized = normalizeForEditor(selectedContent.content || '');
       console.debug('EditTab: loading selectedContent', {
-        isHtml: isLikelyHtml(selectedContent.content || ''),
-        snippet: (selectedContent.content || '').slice(0, 120)
+        original: (selectedContent.content || '').slice(0, 120),
+        normalized: normalized.slice(0, 120)
       });
       setOriginalContent(normalized);
       setEditedContent(normalized);
@@ -97,7 +95,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
   // Debug: what is being passed to ReactQuill
   useEffect(() => {
     try {
-      console.debug('EditTab -> editedContent snippet:', editedContent.slice(0, 200), 'isHtml:', isLikelyHtml(editedContent));
+      console.debug('EditTab -> editedContent for ReactQuill:', editedContent.slice(0, 200));
     } catch {}
   }, [editedContent]);
 
@@ -156,10 +154,8 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
         const editedContentResult = result.edited_content || result.response;
         
         if (editedContentResult) {
-          // Convert plain text to HTML if needed for proper rich text display
-          const formattedContent = isLikelyHtml(editedContentResult) 
-            ? editedContentResult 
-            : toHtmlFromPlainText(editedContentResult);
+          // Convert content to HTML for proper rich text display
+          const formattedContent = toHtmlFromContent(editedContentResult);
           setEditedContent(formattedContent);
           toast({
             title: "Content edited successfully",
@@ -197,7 +193,7 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       const formatted = normalizeForEditor(aiSuggestion);
       setEditedContent(formatted);
       setAiSuggestion('');
-      console.debug('Applied AI suggestion, isHtml:', isLikelyHtml(aiSuggestion));
+      console.debug('Applied AI suggestion:', { original: aiSuggestion.slice(0, 100), formatted: formatted.slice(0, 100) });
       toast({
         title: "Suggestion applied",
         description: "The AI suggestion has been applied to your content.",
