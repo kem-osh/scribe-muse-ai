@@ -2,6 +2,9 @@ export interface WebhookResponse {
   response?: string;
   error?: string;
   status?: string;
+  edited_content?: string;
+  synthesized_content?: string;
+  suggestion?: string;
 }
 
 export const parseWebhookResponse = async (response: Response): Promise<WebhookResponse> => {
@@ -40,6 +43,49 @@ export const parseWebhookResponse = async (response: Response): Promise<WebhookR
     // If completely empty or invalid
     return {
       error: 'Empty or invalid response from webhook'
+    };
+  }
+};
+
+export const callEditWebhook = async (webhookUrl: string, data: {
+  content: string;
+  title: string;
+  goal: string;
+  tone: string;
+  content_type: string;
+}): Promise<WebhookResponse> => {
+  try {
+    const response = await fetch(webhookUrl, createWebhookRequest({
+      type: 'edit_content',
+      ...data
+    }));
+    
+    return await parseWebhookResponse(response);
+  } catch (error) {
+    console.error('Error calling edit webhook:', error);
+    return {
+      error: 'Failed to call webhook. Please check your connection and try again.'
+    };
+  }
+};
+
+export const callSynthesizeWebhook = async (webhookUrl: string, data: {
+  contents: Array<{ title: string; content: string; content_type: string }>;
+  goal: string;
+  tone: string;
+  target_type: string;
+}): Promise<WebhookResponse> => {
+  try {
+    const response = await fetch(webhookUrl, createWebhookRequest({
+      type: 'synthesize_content',
+      ...data
+    }));
+    
+    return await parseWebhookResponse(response);
+  } catch (error) {
+    console.error('Error calling synthesize webhook:', error);
+    return {
+      error: 'Failed to call synthesis webhook. Please check your connection and try again.'
     };
   }
 };

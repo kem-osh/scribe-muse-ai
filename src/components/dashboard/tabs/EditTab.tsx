@@ -96,13 +96,29 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40', {
+      // Try user's custom webhook first, fallback to default
+      let webhookUrl = 'https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40';
+      
+      // Check if user has custom webhook URL
+      if (user) {
+        const { data: settings } = await supabase
+          .from('user_settings')
+          .select('webhook_url')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (settings?.webhook_url) {
+          webhookUrl = settings.webhook_url;
+        }
+      }
+
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type: 'edit_suggestion',
+          type: 'edit_content',
           content: editedContent,
           title: editedTitle,
           goal: editGoal,
@@ -116,12 +132,21 @@ export const EditTab: React.FC<EditTabProps> = ({ selectedContent }) => {
       }
 
       const data = await response.json();
-      setAiSuggestion(data.suggestion || 'No suggestion available');
+      const editedContentResult = data.edited_content || data.suggestion || data.response;
       
-      toast({
-        title: "AI suggestion generated",
-        description: "Review the suggestion in the panel below.",
-      });
+      if (editedContentResult) {
+        setEditedContent(editedContentResult);
+        toast({
+          title: "Content edited successfully",
+          description: "Your content has been edited using AI.",
+        });
+      } else {
+        setAiSuggestion(data.suggestion || 'No suggestion available');
+        toast({
+          title: "AI suggestion generated",
+          description: "Review the suggestion in the panel below.",
+        });
+      }
 
     } catch (error) {
       console.error('Error getting AI suggestion:', error);
