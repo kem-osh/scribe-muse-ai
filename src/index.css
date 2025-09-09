@@ -148,14 +148,14 @@
   .content-card {
     @apply bg-gradient-to-br from-surface/95 to-surface/90 border border-border/70 rounded-2xl 
            p-5 sm:p-6 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30 
-           transition-all duration-300 ease-out cursor-pointer group relative overflow-hidden
+           transition-all duration-300 ease-out cursor-pointer relative overflow-hidden
            hover:scale-[1.02] hover:-translate-y-1 active:scale-[0.99];
   }
   
   .content-card::before {
     content: '';
     @apply absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 
-           opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none;
+           opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none;
   }
   
   .content-card-selected {
@@ -201,15 +201,15 @@
   .tab-item {
     @apply relative px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground 
            transition-all duration-300 ease-out border-b-2 border-transparent 
-           hover:border-primary/30 hover:bg-primary/5 rounded-t-lg group cursor-pointer
+           hover:border-primary/30 hover:bg-primary/5 rounded-t-lg cursor-pointer
            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98];
   }
   
   .tab-item::before {
     content: '';
     @apply absolute inset-0 rounded-t-lg bg-gradient-to-b from-primary/0 to-primary/0 
-           transition-all duration-300 ease-out opacity-0 group-hover:opacity-100;
-    background: linear-gradient(135deg, hsl(var(--primary) / 0.05), hsl(var(--primary) / 0.02)));
+           transition-all duration-300 ease-out opacity-0 hover:opacity-100;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.05), hsl(var(--primary) / 0.02));
   }
   
   .tab-item-active {
@@ -219,7 +219,7 @@
   
   .tab-item-active::before {
     @apply opacity-100;
-    background: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.08)));
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.08));
   }
   
   .tab-item-active::after {
