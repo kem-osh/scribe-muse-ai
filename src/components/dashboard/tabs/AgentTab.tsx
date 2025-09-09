@@ -165,43 +165,49 @@ export const AgentTab: React.FC = () => {
       </div>
 
       {/* Input */}
-      <div className="border-t border-border bg-surface/50 p-4 sm:p-6">
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-          <div className="flex-1">
-            <Textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me anything about your writing..."
-              className="input-primary min-h-[80px] sm:min-h-[60px] max-h-[120px] resize-none text-base"
-              disabled={isLoading}
-            />
+      <div className="chat-input-area p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex space-x-3">
+            <div className="flex-1 relative">
+              <Textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask me anything about your writing..."
+                className="input-primary min-h-[80px] sm:min-h-[60px] max-h-[120px] resize-none text-base pr-12 rounded-2xl border-border/70 focus:border-primary/50 shadow-sm"
+                disabled={isLoading}
+              />
+              <div className="absolute bottom-3 right-3 flex items-center space-x-1">
+                {input.trim() && (
+                  <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
+                    {input.trim().split(/\s+/).length} words
+                  </span>
+                )}
+              </div>
+            </div>
+            <Button
+              type="submit"
+              disabled={!input.trim() || isLoading}
+              className="btn-accent self-end h-12 w-12 sm:w-auto sm:px-6 rounded-xl"
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <Send className="w-5 h-5 sm:mr-2" />
+                  <span className="hidden sm:inline">Send</span>
+                </>
+              )}
+            </Button>
           </div>
-          <Button
-            type="submit"
-            disabled={!input.trim() || isLoading}
-            className="btn-accent sm:self-end h-12 sm:h-auto px-6"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 sm:mr-0" />
-                <span className="ml-2 sm:hidden">Sending...</span>
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4 sm:mr-0" />
-                <span className="ml-2 sm:hidden">Send</span>
-              </>
-            )}
-          </Button>
+          
+          <div className="flex items-center justify-center text-xs text-muted-foreground/70">
+            <Sparkles className="w-3 h-3 mr-1 text-primary/60" />
+            <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line</span>
+            <span className="sm:hidden">Tap send or use Enter</span>
+          </div>
         </form>
-        
-        <div className="mt-3 flex items-center justify-center text-xs text-muted-foreground">
-          <Sparkles className="w-3 h-3 mr-1" />
-          <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line</span>
-          <span className="sm:hidden">Tap send or use Enter</span>
-        </div>
       </div>
     </div>
   );

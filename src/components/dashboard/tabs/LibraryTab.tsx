@@ -389,9 +389,14 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
     <div className="h-full overflow-y-auto p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Content Library</h1>
-          <p className="text-muted-foreground">
+        <div className="text-center space-y-4 mb-2">
+          <div className="relative inline-block">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+              Content Library
+            </h1>
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg blur opacity-30"></div>
+          </div>
+          <p className="text-muted-foreground/80 text-lg max-w-2xl mx-auto leading-relaxed">
             Organize and manage all your content in one place
           </p>
         </div>
@@ -574,34 +579,47 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
               {content.map((item) => (
                 <Card 
                   key={item.id} 
-                  className={`content-card group cursor-pointer hover:shadow-lg transition-all ${
-                    selectedItems.includes(item.id) ? 'ring-2 ring-accent' : ''
+                  className={`content-card group cursor-pointer relative ${
+                    selectedItems.includes(item.id) ? 'content-card-selected' : ''
                   }`}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).closest('.card-actions')) return;
                     onSelectContent(item);
                   }}
                 >
-                  <CardHeader className="pb-3">
+                  <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center space-x-3 flex-1 min-w-0">
-                        <Checkbox
-                          checked={selectedItems.includes(item.id)}
-                          onCheckedChange={() => handleSelectItem(item.id)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectItem(item.id);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {selectedItems.includes(item.id) ? (
+                            <div className="w-5 h-5 bg-primary text-primary-foreground rounded-md flex items-center justify-center shadow-sm">
+                              <CheckSquare className="w-4 h-4" />
+                            </div>
+                          ) : (
+                            <div className="w-5 h-5 border-2 border-muted-foreground/30 rounded-md hover:border-primary/50 transition-colors group-hover:border-primary/40" />
+                          )}
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg truncate">{item.title}</CardTitle>
-                          <CardDescription className="flex items-center flex-wrap gap-2 mt-1">
-                            <Badge className={getContentTypeColor(item.content_type)}>
-                              {item.content_type}
+                          <CardTitle className="text-lg font-semibold line-clamp-2 hover:text-primary transition-colors">
+                            {item.title}
+                          </CardTitle>
+                          <CardDescription className="flex items-center flex-wrap gap-2 mt-2">
+                            <Badge className={`${getContentTypeColor(item.content_type)} text-xs px-3 py-1 font-medium`}>
+                              {item.content_type.replace('-', ' ')}
                             </Badge>
                             {item.category && (
                               <Badge 
                                 variant="outline" 
-                                className="text-xs"
+                                className="text-xs px-3 py-1 border-2"
                                 style={{ 
-                                  borderColor: item.category.color,
+                                  borderColor: item.category.color + '40',
+                                  backgroundColor: item.category.color + '10',
                                   color: item.category.color 
                                 }}
                               >
@@ -609,9 +627,9 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                                 {item.category.name}
                               </Badge>
                             )}
-                            <span className="text-xs text-muted-foreground flex items-center">
+                            <span className="text-xs text-muted-foreground/80 flex items-center bg-muted/40 px-2 py-1 rounded-lg">
                               <Calendar className="w-3 h-3 mr-1" />
-                              {format(new Date(item.created_at), 'MMM d, yyyy')}
+                              {format(new Date(item.created_at), 'MMM d')}
                             </span>
                           </CardDescription>
                         </div>
@@ -632,19 +650,20 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                     {item.tags && item.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {item.tags.slice(0, 3).map((tag) => (
-                          <Badge 
-                            key={tag.id}
-                            variant="secondary" 
-                            className="text-xs"
-                            style={{ 
-                              backgroundColor: `${tag.color}20`,
-                              color: tag.color,
-                              borderColor: `${tag.color}40`
-                            }}
-                          >
-                            <Tag className="w-2 h-2 mr-1" />
-                            {tag.name}
-                          </Badge>
+                                <Badge 
+                                  key={tag.id}
+                                  variant="secondary" 
+                                  className="text-xs px-3 py-1 rounded-full font-medium hover:scale-105 transition-transform"
+                                  style={{ 
+                                    backgroundColor: `${tag.color}15`,
+                                    color: tag.color,
+                                    borderColor: `${tag.color}30`,
+                                    border: '1px solid'
+                                  }}
+                                >
+                                  <Tag className="w-2 h-2 mr-1" />
+                                  {tag.name}
+                                </Badge>
                         ))}
                         {item.tags.length > 3 && (
                           <Badge variant="secondary" className="text-xs">
@@ -670,14 +689,14 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                     </div>
 
                     {/* Actions */}
-                    <div className="card-actions flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="card-actions flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300">
                       <Button
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectContent(item);
                         }}
-                        className="btn-accent flex-1 h-10"
+                        className="btn-accent flex-1 h-10 rounded-xl shadow-sm hover:shadow-md"
                       >
                         <Edit3 className="w-4 h-4 mr-2" />
                         Edit
@@ -690,7 +709,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                             e.stopPropagation();
                             handleDuplicate(item);
                           }}
-                          className="flex-1 sm:flex-none h-10"
+                          className="flex-1 sm:flex-none h-10 rounded-xl hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all"
                         >
                           <Copy className="w-4 h-4 sm:mr-0 mr-2" />
                           <span className="sm:hidden">Duplicate</span>
@@ -702,7 +721,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                             e.stopPropagation();
                             handleDelete(item.id);
                           }}
-                          className="hover:bg-destructive hover:text-destructive-foreground flex-1 sm:flex-none h-10"
+                          className="hover:bg-destructive hover:text-destructive-foreground flex-1 sm:flex-none h-10 rounded-xl border-destructive/20 text-destructive hover:border-destructive transition-all"
                         >
                           <Trash2 className="w-4 h-4 sm:mr-0 mr-2" />
                           <span className="sm:hidden">Delete</span>

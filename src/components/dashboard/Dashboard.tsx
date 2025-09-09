@@ -41,12 +41,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialTab = 'agent' }) =>
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background/98 to-surface/50">
       {/* Navigation with integrated header */}
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} user={user} />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto bg-gradient-to-b from-transparent via-surface/10 to-surface/30">
         {renderTabContent()}
       </main>
     </div>

@@ -119,30 +119,47 @@
 }
 
 @layer components {
-  /* Chat Interface Components */
+  /* Chat Interface - Enhanced Conversational Design */
   .chat-container {
-    @apply flex flex-col h-full bg-gradient-to-b from-background to-surface;
+    @apply flex flex-col bg-gradient-to-br from-background via-background/95 to-surface/30;
   }
   
   .chat-message {
-    @apply rounded-2xl px-4 py-3 max-w-[85%] break-words;
+    @apply rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 ease-out max-w-4xl;
   }
   
   .chat-message-user {
-    @apply bg-accent text-accent-foreground ml-auto;
+    @apply bg-gradient-to-br from-primary to-primary/90 text-primary-foreground ml-auto 
+           shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 
+           border border-primary/20;
   }
   
   .chat-message-ai {
-    @apply bg-chat-ai text-foreground;
+    @apply bg-gradient-to-br from-surface to-surface/90 border border-border/70 
+           shadow-sm hover:shadow-md hover:border-border transition-all duration-200;
   }
   
-  /* Card Components */
+  .chat-input-area {
+    @apply bg-gradient-to-r from-surface/95 to-surface/90 backdrop-blur-xl 
+           border-t border-border/50 shadow-lg;
+  }
+  
+  /* Content Cards - Enhanced with Modern Effects */
   .content-card {
-    @apply bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200;
+    @apply bg-gradient-to-br from-surface/95 to-surface/90 border border-border/70 rounded-2xl 
+           p-5 sm:p-6 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30 
+           transition-all duration-300 ease-out cursor-pointer group relative overflow-hidden
+           hover:scale-[1.02] hover:-translate-y-1 active:scale-[0.99];
   }
   
-  .content-card:hover {
-    @apply border-accent/20 shadow-accent/10;
+  .content-card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 
+           opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none;
+  }
+  
+  .content-card-selected {
+    @apply border-primary/50 bg-gradient-to-br from-primary/5 to-primary/10 shadow-lg shadow-primary/10;
   }
   
   /* Input Components */
@@ -150,30 +167,64 @@
     @apply bg-surface border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-accent focus:ring-2 focus:ring-accent/20;
   }
   
-  /* Button Variants */
+  /* Button Variants - Enhanced Interactive Design */
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-6 py-2.5 font-medium transition-all duration-200;
+    @apply bg-gradient-to-br from-primary to-primary/90 text-primary-foreground 
+           hover:from-primary/90 hover:to-primary/80 shadow-md hover:shadow-xl 
+           hover:shadow-primary/20 transition-all duration-200 hover:scale-[1.02] 
+           active:scale-[0.98] border border-primary/20 hover:border-primary/30;
   }
   
   .btn-accent {
-    @apply bg-accent text-accent-foreground hover:bg-accent/90 rounded-xl px-6 py-2.5 font-medium transition-all duration-200;
+    @apply bg-gradient-to-br from-accent to-accent/90 text-accent-foreground 
+           hover:from-accent/90 hover:to-accent/80 shadow-md hover:shadow-xl 
+           hover:shadow-accent/20 transition-all duration-200 hover:scale-[1.02] 
+           active:scale-[0.98] border border-accent/20 hover:border-accent/30;
   }
   
   .btn-ghost {
-    @apply bg-transparent text-muted-foreground hover:text-foreground hover:bg-surface rounded-xl px-4 py-2.5 font-medium transition-all duration-200;
+    @apply hover:bg-gradient-to-br hover:from-muted/80 hover:to-muted/60 
+           hover:text-foreground transition-all duration-200 rounded-lg 
+           hover:shadow-sm active:scale-[0.98];
   }
   
-  /* Tab Navigation */
+  .btn-floating {
+    @apply fixed bottom-6 right-6 z-50 rounded-full shadow-xl hover:shadow-2xl 
+           transform transition-all duration-300 hover:scale-110 active:scale-95;
+  }
+  
+  /* Tab Navigation - Enhanced Modern Design */
   .tab-nav {
-    @apply flex border-b border-border bg-surface/50 backdrop-blur-sm;
+    @apply border-b border-border/50 bg-gradient-to-r from-surface/90 to-surface/80 backdrop-blur-xl;
   }
   
   .tab-item {
-    @apply px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-accent/50 transition-all duration-200 touch-manipulation;
+    @apply relative px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground 
+           transition-all duration-300 ease-out border-b-2 border-transparent 
+           hover:border-primary/30 hover:bg-primary/5 rounded-t-lg group cursor-pointer
+           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98];
+  }
+  
+  .tab-item::before {
+    content: '';
+    @apply absolute inset-0 rounded-t-lg bg-gradient-to-b from-primary/0 to-primary/0 
+           transition-all duration-300 ease-out opacity-0 group-hover:opacity-100;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.05), hsl(var(--primary) / 0.02)));
   }
   
   .tab-item-active {
-    @apply text-accent border-accent;
+    @apply text-primary border-primary bg-gradient-to-b from-primary/10 to-primary/5 
+           shadow-md shadow-primary/10 scale-[1.02] font-semibold;
+  }
+  
+  .tab-item-active::before {
+    @apply opacity-100;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.08)));
+  }
+  
+  .tab-item-active::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full;
   }
   
   /* Loading States */

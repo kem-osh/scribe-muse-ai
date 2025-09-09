@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, Link2, FileText, Loader2, CheckCircle } from 'lucide-react';
+import { Upload, Link2, FileText, Loader2, CheckCircle, Edit3 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -156,9 +156,14 @@ export const CreateTab: React.FC = () => {
   return (
     <div className="h-full overflow-y-auto p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Create Content</h1>
-          <p className="text-muted-foreground">
+        <div className="text-center space-y-4 mb-2">
+          <div className="relative inline-block">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+              Create Content
+            </h1>
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg blur opacity-30"></div>
+          </div>
+          <p className="text-muted-foreground/80 text-lg max-w-2xl mx-auto leading-relaxed">
             Upload files, paste text, or import from URLs to add content to your library
           </p>
         </div>
@@ -166,11 +171,13 @@ export const CreateTab: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Metadata */}
-            <Card className="lg:col-span-1 order-2 lg:order-1">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-lg">
-                  <FileText className="w-5 h-5" />
-                  <span>Details</span>
+            <Card className="lg:col-span-1 order-2 lg:order-1 content-card border-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center space-x-2 text-lg text-primary">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <FileText className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-semibold">Content Details</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -256,9 +263,14 @@ export const CreateTab: React.FC = () => {
             </Card>
 
             {/* Content Editor */}
-            <Card className="lg:col-span-2 order-1 lg:order-2">
-              <CardHeader>
-                <CardTitle className="text-lg">Content *</CardTitle>
+            <Card className="lg:col-span-2 order-1 lg:order-2 content-card border-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center space-x-2 text-primary">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <Edit3 className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-semibold">Content Editor *</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
@@ -282,18 +294,18 @@ export const CreateTab: React.FC = () => {
             <Button
               type="submit"
               disabled={!title.trim() || !content.trim() || isLoading}
-              className="btn-accent px-6 sm:px-8 w-full sm:w-auto h-12 sm:h-auto text-base"
+              className="btn-accent px-8 w-full sm:w-auto h-12 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
             >
               {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Saving Content...</span>
+                </div>
               ) : (
-                <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Save Content
-                </>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Save to Library</span>
+                </div>
               )}
             </Button>
           </div>

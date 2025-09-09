@@ -260,9 +260,14 @@ export const PublishTab: React.FC = () => {
     <div className="h-full overflow-y-auto p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Publish Content</h1>
-          <p className="text-muted-foreground">
+        <div className="text-center space-y-4 mb-2">
+          <div className="relative inline-block">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+              Publish Content
+            </h1>
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg blur opacity-30"></div>
+          </div>
+          <p className="text-muted-foreground/80 text-lg max-w-2xl mx-auto leading-relaxed">
             Distribute your content across multiple platforms
           </p>
         </div>
