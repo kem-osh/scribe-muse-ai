@@ -130,7 +130,26 @@ export const FeedbackTab: React.FC = () => {
 
     const webhookUrl = import.meta.env.VITE_WEBHOOK_URL || 'https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40';
 
-    const payload: FeedbackFormData = {
+    const payload = {
+      // Schema marker
+      schema: "Feedback",
+      
+      // Nested structured data
+      Feedback: {
+        type: formData.type,
+        subject: formData.subject,
+        description: formData.description,
+        priority: formData.priority
+      },
+      
+      // Context metadata
+      context: {
+        timestamp: new Date().toISOString(),
+        page_url: window.location.href,
+        user_agent: navigator.userAgent
+      },
+      
+      // Backward compatibility - keep flat structure
       ...formData,
       timestamp: new Date().toISOString(),
       page_url: window.location.href,
