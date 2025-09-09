@@ -5,10 +5,11 @@ import { CreateTab } from './tabs/CreateTab';
 import { LibraryTab } from './tabs/LibraryTab';
 import { EditTab } from './tabs/EditTab';
 import { PublishTab } from './tabs/PublishTab';
+import { SettingsTab } from './tabs/SettingsTab';
 import { FeedbackTab } from '../feedback/FeedbackTab';
 import { useAuth } from '@/hooks/useAuth';
 
-export type TabType = 'agent' | 'create' | 'library' | 'edit' | 'publish';
+export type TabType = 'agent' | 'create' | 'library' | 'edit' | 'publish' | 'settings';
 
 interface DashboardProps {
   initialTab?: TabType;
@@ -36,6 +37,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialTab = 'agent' }) =>
         return <EditTab selectedContent={selectedContent} />;
       case 'publish':
         return <PublishTab />;
+      case 'settings':
+        return <SettingsTab />;
       default:
         return <AgentTab />;
     }

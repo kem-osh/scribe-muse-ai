@@ -8,6 +8,7 @@ import {
   Library, 
   Edit3, 
   Share2,
+  Settings,
   Sparkles,
   LogOut
 } from 'lucide-react';
@@ -25,6 +26,7 @@ const tabs = [
   { id: 'library' as TabType, label: 'Library', icon: Library },
   { id: 'edit' as TabType, label: 'Edit', icon: Edit3 },
   { id: 'publish' as TabType, label: 'Publish', icon: Share2 },
+  { id: 'settings' as TabType, label: 'Settings', icon: Settings },
 ];
 
 export const TabNavigation: React.FC<TabNavigationProps> = ({
