@@ -8,7 +8,15 @@ export function cn(...inputs: ClassValue[]) {
 
 // Unicode-safe content hashing for duplicate detection
 export function normalizeContent(content: string): string {
-  return content
+  if (!content) return '';
+  
+  // Strip HTML tags if content appears to be HTML
+  let cleanContent = content;
+  if (isLikelyHtml(content)) {
+    cleanContent = stripHtml(content);
+  }
+  
+  return cleanContent
     .trim()
     .replace(/\s+/g, ' ') // normalize whitespace
     .toLowerCase();
