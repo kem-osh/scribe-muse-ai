@@ -5,6 +5,7 @@ import { CreateTab } from './tabs/CreateTab';
 import { LibraryTab } from './tabs/LibraryTab';
 import { EditTab } from './tabs/EditTab';
 import { PublishTab } from './tabs/PublishTab';
+import { FeedbackTab } from '../feedback/FeedbackTab';
 import { useAuth } from '@/hooks/useAuth';
 
 export type TabType = 'agent' | 'create' | 'library' | 'edit' | 'publish';
@@ -49,6 +50,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialTab = 'agent' }) =>
       <main className="flex-1 overflow-auto bg-gradient-to-b from-transparent via-surface/10 to-surface/30">
         {renderTabContent()}
       </main>
+
+      {/* Feedback Tab - appears on all pages */}
+      <FeedbackTab />
     </div>
   );
 };
