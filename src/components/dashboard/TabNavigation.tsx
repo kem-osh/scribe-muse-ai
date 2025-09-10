@@ -56,9 +56,9 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex-1 max-w-3xl mx-6 hidden md:block">
-          <div className="flex justify-center bg-muted/30 rounded-2xl p-1 backdrop-blur-sm border border-border/50">
+        {/* Tab Navigation - Desktop */}
+        <div className="flex-1 max-w-4xl mx-6 hidden lg:block">
+          <div className="flex justify-center bg-muted/30 rounded-2xl p-1 backdrop-blur-sm border border-border/50 shadow-sm">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -67,7 +67,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex items-center justify-center space-x-2 flex-1 min-h-[44px] px-4 py-2 relative z-10`}
+                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex items-center justify-center space-x-2 flex-1 min-h-[48px] px-4 py-3 relative z-10 transition-all duration-200`}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="text-sm font-medium">{tab.label}</span>
@@ -77,9 +77,9 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
           </div>
         </div>
 
-        {/* Mobile Tab Navigation */}
-        <div className="md:hidden flex-1 max-w-md mx-4">
-          <div className="flex bg-muted/30 rounded-xl p-1">
+        {/* Tab Navigation - Tablet */}
+        <div className="hidden md:block lg:hidden flex-1 max-w-2xl mx-4">
+          <div className="flex bg-muted/30 rounded-xl p-1 backdrop-blur-sm border border-border/50">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -88,7 +88,7 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col items-center justify-center space-y-1 flex-1 min-h-[48px] px-1 py-2`}
+                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col items-center justify-center space-y-1 flex-1 min-h-[52px] px-2 py-2 transition-all duration-200`}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="text-xs font-medium">{tab.label}</span>
@@ -98,16 +98,37 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
           </div>
         </div>
 
+        {/* Mobile Tab Navigation */}
+        <div className="md:hidden flex-1 max-w-xs mx-2">
+          <div className="flex bg-muted/30 rounded-xl p-1 backdrop-blur-sm border border-border/50">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className={`tab-item ${isActive ? 'tab-item-active' : ''} flex flex-col items-center justify-center space-y-1 flex-1 min-h-[56px] px-1 py-2 transition-all duration-200 touch-manipulation`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="text-xs font-medium leading-tight">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* User Info & Actions */}
-        <div className="flex items-center space-x-3 min-w-0">
-          <div className="hidden lg:block text-right min-w-0">
-            <p className="text-sm text-muted-foreground/80 truncate">{user?.email}</p>
+        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+          <div className="hidden xl:block text-right min-w-0">
+            <p className="text-sm text-muted-foreground/80 truncate max-w-[120px]">{user?.email}</p>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleFeedbackClick}
-            className="btn-ghost flex-shrink-0 hover:bg-accent/10 hover:text-accent transition-all duration-200"
+            className="btn-ghost flex-shrink-0 hover:bg-accent/10 hover:text-accent transition-all duration-200 min-h-[44px] touch-manipulation"
             aria-label="Send feedback"
           >
             <MessageCircle className="w-4 h-4 sm:mr-2" />
@@ -117,7 +138,8 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
             variant="ghost"
             size="sm"
             onClick={signOut}
-            className="btn-ghost flex-shrink-0 hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
+            className="btn-ghost flex-shrink-0 hover:bg-destructive/10 hover:text-destructive transition-all duration-200 min-h-[44px] touch-manipulation"
+            aria-label="Sign out"
           >
             <LogOut className="w-4 h-4 sm:mr-2" />
             <span className="hidden sm:inline">Sign Out</span>
