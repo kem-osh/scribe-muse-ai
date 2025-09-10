@@ -5,6 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { 
   Search, 
   FileText, 
@@ -23,8 +26,12 @@ import {
   Square,
   Palette,
   Settings,
-  Plus
+  Plus,
+  MoreHorizontal,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -86,8 +93,11 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [showSynthesizeDialog, setShowSynthesizeDialog] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const loadContent = async () => {
     if (!user) return;
@@ -247,6 +257,7 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
       if (error) throw error;
 
       setContent(prev => prev.filter(item => item.id !== contentId));
+      setDeleteItemId(null);
       toast({
         title: "Content deleted",
         description: "The content has been removed from your library.",
@@ -416,146 +427,210 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
           </p>
         </div>
 
-        {/* Filters and Search */}
+        {/* Search and Quick Actions */}
         <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Filter className="w-5 h-5" />
-                <span>Filters & Search</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowCategoryManager(true)}
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Manage Categories
-                </Button>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {/* Search */}
-              <div className="relative sm:col-span-2 lg:col-span-1">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Search - takes full width on mobile, flexible on desktop */}
+              <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search content..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-primary pl-10 h-12 text-base"
+                  className="input-primary pl-10 h-10"
                 />
               </div>
+              
+              {/* Mobile: Collapsible Filters */}
+              {isMobile && (
+                <Collapsible open={isFiltersExpanded} onOpenChange={setIsFiltersExpanded}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                      <Filter className="w-4 h-4 mr-2" />
+                      Filters
+                      {isFiltersExpanded ? (
+                        <ChevronUp className="w-4 h-4 ml-2" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-4">
+                    <div className="space-y-3">
+                      <Select value={filterType} onValueChange={setFilterType}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="All Types" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border z-50">
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value="article">Article</SelectItem>
+                          <SelectItem value="blog-post">Blog Post</SelectItem>
+                          <SelectItem value="social-media">Social Media</SelectItem>
+                          <SelectItem value="newsletter">Newsletter</SelectItem>
+                          <SelectItem value="script">Script</SelectItem>
+                          <SelectItem value="notes">Notes</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
 
-              {/* Type Filter */}
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="input-primary h-12">
-                  <SelectValue placeholder="Filter by type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="article">Article</SelectItem>
-                  <SelectItem value="blog-post">Blog Post</SelectItem>
-                  <SelectItem value="social-media">Social Media</SelectItem>
-                  <SelectItem value="newsletter">Newsletter</SelectItem>
-                  <SelectItem value="script">Script</SelectItem>
-                  <SelectItem value="notes">Notes</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+                      <Select value={filterCategory} onValueChange={setFilterCategory}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border z-50">
+                          <SelectItem value="all">All Categories</SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              <div className="flex items-center space-x-2">
+                                <div 
+                                  className="w-3 h-3 rounded"
+                                  style={{ backgroundColor: category.color }}
+                                />
+                                <span>{category.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-              {/* Category Filter */}
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="input-primary h-12">
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      <div className="flex items-center space-x-2">
-                        <div 
-                          className="w-3 h-3 rounded"
-                          style={{ backgroundColor: category.color }}
-                        />
-                        <span>{category.name}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                      <Select value={filterTag} onValueChange={setFilterTag}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="All Tags" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border z-50">
+                          <SelectItem value="all">All Tags</SelectItem>
+                          {tags.map((tag) => (
+                            <SelectItem key={tag.id} value={tag.id}>
+                              <div className="flex items-center space-x-2">
+                                <div 
+                                  className="w-3 h-3 rounded"
+                                  style={{ backgroundColor: tag.color }}
+                                />
+                                <span>{tag.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-              {/* Tag Filter */}
-              <Select value={filterTag} onValueChange={setFilterTag}>
-                <SelectTrigger className="input-primary h-12">
-                  <SelectValue placeholder="Filter by tag" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Tags</SelectItem>
-                  {tags.map((tag) => (
-                    <SelectItem key={tag.id} value={tag.id}>
-                      <div className="flex items-center space-x-2">
-                        <div 
-                          className="w-3 h-3 rounded"
-                          style={{ backgroundColor: tag.color }}
-                        />
-                        <span>{tag.name}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Sort by" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border z-50">
+                          <SelectItem value="created_desc">Newest First</SelectItem>
+                          <SelectItem value="created_asc">Oldest First</SelectItem>
+                          <SelectItem value="updated_desc">Recently Updated</SelectItem>
+                          <SelectItem value="title_asc">Title A-Z</SelectItem>
+                          <SelectItem value="title_desc">Title Z-A</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+              
+              {/* Desktop: Horizontal Filters */}
+              {!isMobile && (
+                <div className="flex gap-2 flex-wrap">
+                  <Select value={filterType} onValueChange={setFilterType}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border z-50">
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="article">Article</SelectItem>
+                      <SelectItem value="blog-post">Blog Post</SelectItem>
+                      <SelectItem value="social-media">Social Media</SelectItem>
+                      <SelectItem value="newsletter">Newsletter</SelectItem>
+                      <SelectItem value="script">Script</SelectItem>
+                      <SelectItem value="notes">Notes</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-              {/* Sort */}
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="input-primary h-12">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="created_desc">Newest First</SelectItem>
-                  <SelectItem value="created_asc">Oldest First</SelectItem>
-                  <SelectItem value="updated_desc">Recently Updated</SelectItem>
-                  <SelectItem value="title_asc">Title A-Z</SelectItem>
-                  <SelectItem value="title_desc">Title Z-A</SelectItem>
-                </SelectContent>
-              </Select>
+                  <Select value={filterCategory} onValueChange={setFilterCategory}>
+                    <SelectTrigger className="w-36">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border z-50">
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          <div className="flex items-center space-x-2">
+                            <div 
+                              className="w-3 h-3 rounded"
+                              style={{ backgroundColor: category.color }}
+                            />
+                            <span>{category.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Sort" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border z-50">
+                      <SelectItem value="created_desc">Newest</SelectItem>
+                      <SelectItem value="created_asc">Oldest</SelectItem>
+                      <SelectItem value="updated_desc">Updated</SelectItem>
+                      <SelectItem value="title_asc">A-Z</SelectItem>
+                      <SelectItem value="title_desc">Z-A</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCategoryManager(true)}
+                className="whitespace-nowrap"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Categories
+              </Button>
             </div>
 
-            {/* Bulk Actions */}
+            {/* Bulk Actions - Sticky toolbar when items selected */}
             {selectedItems.length > 0 && (
-              <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg border border-accent/20">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">
-                    {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleExportContent}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => setShowSynthesizeDialog(true)}
-                    className="btn-accent"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Synthesize
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={handleBulkDelete}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </Button>
+              <div className="sticky top-0 z-10 mb-6 p-4 bg-accent/10 border border-accent/20 rounded-lg backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-foreground">
+                      {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleExportContent}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => setShowSynthesizeDialog(true)}
+                      className="btn-accent"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Synthesize
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={handleBulkDelete}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
@@ -590,15 +665,15 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {content.map((item) => (
                 <Card 
                   key={item.id} 
-                  className={`content-card group cursor-pointer relative ${
-                    selectedItems.includes(item.id) ? 'content-card-selected' : ''
+                  className={`group relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-primary/20 cursor-pointer ${
+                    selectedItems.includes(item.id) ? 'ring-2 ring-primary/20 bg-primary/5' : 'hover:bg-surface/50'
                   }`}
                   onClick={(e) => {
-                    if ((e.target as HTMLElement).closest('.card-actions, .inline-editor')) return;
+                    if ((e.target as HTMLElement).closest('.card-actions, .inline-editor, .select-checkbox')) return;
                     onSelectContent(item);
                   }}
                 >
@@ -610,101 +685,118 @@ export const LibraryTab: React.FC<LibraryTabProps> = ({ onSelectContent }) => {
                           e.stopPropagation();
                           handleSelectItem(item.id);
                         }}
-                        className="cursor-pointer flex-shrink-0 mt-1"
+                        className="select-checkbox cursor-pointer flex-shrink-0 mt-2"
                       >
                         {selectedItems.includes(item.id) ? (
                           <div className="w-5 h-5 bg-primary text-primary-foreground rounded-md flex items-center justify-center shadow-sm">
                             <CheckSquare className="w-4 h-4" />
                           </div>
                         ) : (
-                          <div className="w-5 h-5 border-2 border-muted-foreground/30 rounded-md hover:border-primary/50 transition-colors group-hover:border-primary/40" />
+                          <div className="w-5 h-5 border-2 border-muted-foreground/30 rounded-md hover:border-primary/50 transition-colors" />
                         )}
                       </div>
 
                       {/* Content Info */}
-                      <div className="flex-1 min-w-0 space-y-3">
-                        {/* Title and Meta */}
+                      <div className="flex-1 min-w-0 space-y-4">
+                        {/* Title and Actions Row */}
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-lg font-semibold line-clamp-2 hover:text-primary transition-colors mb-2">
+                            <h3 className="text-xl font-semibold text-foreground line-clamp-2 hover:text-primary transition-colors cursor-pointer">
                               {item.title}
-                            </CardTitle>
-                            <div className="flex items-center flex-wrap gap-2">
-                              <Badge className={`${getContentTypeColor(item.content_type)} text-xs px-3 py-1 font-medium`}>
+                            </h3>
+                            
+                            {/* Type Label - More subtle styling */}
+                            <div className="mt-2">
+                              <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-muted/60 text-muted-foreground border border-muted-foreground/20">
                                 {item.content_type.replace('-', ' ')}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground/80 flex items-center bg-muted/40 px-2 py-1 rounded-lg">
-                                <Calendar className="w-3 h-3 mr-1" />
-                                {format(new Date(item.created_at), 'MMM d')}
                               </span>
-                              <span className="text-xs text-muted-foreground">
-                                {stripHtml(item.content).split(/\s+/).length} words
-                              </span>
-                              {item.source_url && (() => {
-                                try {
-                                  return (
-                                    <span className="text-xs text-muted-foreground truncate">
-                                      {new URL(item.source_url).hostname}
-                                    </span>
-                                  );
-                                } catch {
-                                  return null;
-                                }
-                              })()}
                             </div>
                           </div>
                           
-                          {/* Actions */}
-                          <div className="card-actions flex space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 flex-shrink-0 ml-4">
-                            <Button
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onSelectContent(item);
-                              }}
-                              className="btn-accent h-8 px-3"
-                            >
-                              <Edit3 className="w-4 h-4 mr-1" />
-                              Edit
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDuplicate(item);
-                              }}
-                              className="h-8 px-3 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-all"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDelete(item.id);
-                              }}
-                              className="hover:bg-destructive hover:text-destructive-foreground h-8 px-3 border-destructive/20 text-destructive hover:border-destructive transition-all"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
+                          {/* Actions - Dropdown Menu */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="card-actions h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreHorizontal className="w-4 h-4" />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-popover border z-50">
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSelectContent(item);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <Edit3 className="w-4 h-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDuplicate(item);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <Copy className="w-4 h-4 mr-2" />
+                                Duplicate
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteItemId(item.id);
+                                }}
+                                className="cursor-pointer text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
+                        {/* Metadata Row */}
+                        <div className="flex items-center flex-wrap gap-3 text-sm text-muted-foreground">
+                          <span className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            {format(new Date(item.created_at), 'MMM d, yyyy')}
+                          </span>
+                          <span className="text-muted-foreground/80">
+                            {stripHtml(item.content).split(/\s+/).length} words
+                          </span>
+                          {item.source_url && (() => {
+                            try {
+                              return (
+                                <span className="text-muted-foreground/80 truncate">
+                                  from {new URL(item.source_url).hostname}
+                                </span>
+                              );
+                            } catch {
+                              return null;
+                            }
+                          })()}
                         </div>
 
                         {/* Content Preview */}
-                        <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap">
+                        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
                           {(() => {
                             const plainContent = stripHtml(item.content);
-                            return plainContent.length > 200 
-                              ? `${plainContent.substring(0, 200)}...` 
+                            return plainContent.length > 300 
+                              ? `${plainContent.substring(0, 300)}...` 
                               : plainContent;
                           })()}
                         </p>
 
                         {/* Category and Tags Row */}
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="inline-editor flex items-center gap-3">
+                        <div className="flex items-center gap-4 pt-2 border-t border-border/50">
+                          <div className="inline-editor flex items-center gap-3 flex-1">
                             <InlineCategoryEditor
                               contentId={item.id}
                               currentCategory={item.category}
