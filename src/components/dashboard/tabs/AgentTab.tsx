@@ -6,7 +6,7 @@ import { Send, Loader2, Sparkles, Brain, Copy, BookPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { parseWebhookResponse, createWebhookRequest } from '@/lib/webhookUtils';
+
 import { renderForPreview } from '@/lib/utils';
 
 interface Message {
@@ -22,11 +22,10 @@ interface EngineOption {
 }
 
 const ENGINE_OPTIONS: EngineOption[] = [
-  { value: 'agent', label: 'Agent' },
-  { value: 'perplexity-sonar-pro', label: 'Perplexity Sonar Pro' },
-  { value: 'claude-sonnet-4', label: 'Claude Sonnet 4' },
-  { value: 'deepseek-r1', label: 'Deepseek R1' },
-  { value: 'gpt-5', label: 'GPT 5' },
+  { value: 'agent', label: '🤖 AI Agent (Smart Selection)' },
+  { value: 'gpt-5', label: '🧠 GPT-5' },
+  { value: 'claude-sonnet-4', label: '🎭 Claude Sonnet 4' },
+  { value: 'perplexity-sonar-pro', label: '🔍 Perplexity Sonar Pro' },
 ];
 
 export const AgentTab: React.FC = () => {
@@ -79,40 +78,32 @@ export const AgentTab: React.FC = () => {
     setIsLoading(true);
 
     try {
-      console.log('Sending message to webhook:', {
+      console.log('Sending message to AI orchestrator:', {
         message: input.trim(),
-        type: 'agent_chat',
         engine: selectedEngine,
         conversation_history: messages.slice(-5)
       });
 
-      const response = await fetch('https://hook.eu2.make.com/3s45gpyrmq1yaf9virec2yql51pcqe40', 
-        createWebhookRequest({
+      const { data, error } = await supabase.functions.invoke('ai-orchestrator', {
+        body: {
           message: input.trim(),
-          type: 'agent_chat',
           engine: selectedEngine,
           conversation_history: messages.slice(-5), // Send last 5 messages for context
-        })
-      );
-
-      console.log('Webhook response received:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok
+          user_id: user?.id,
+        },
       });
 
-      const data = await parseWebhookResponse(response);
-      
-      console.log('Parsed webhook data:', data);
+      console.log('AI orchestrator response:', { data, error });
 
-      // Handle different response types
+      // Handle response
       let aiContent: string;
-      if (data.error) {
-        aiContent = `I'm sorry, there was an error processing your message: ${data.error}`;
-      } else if (data.status === 'accepted') {
-        aiContent = data.response || "I've received your message and I'm processing it. Please wait a moment.";
+      if (error) {
+        console.error('AI orchestrator error:', error);
+        aiContent = `I'm sorry, there was an error processing your message: ${error.message || 'Unknown error'}`;
+      } else if (data?.response) {
+        aiContent = data.response;
       } else {
-        aiContent = data.response || "I apologize, but I'm having trouble responding right now. Please try again.";
+        aiContent = "I apologize, but I'm having trouble responding right now. Please try again.";
       }
       
       const aiMessage: Message = {
