@@ -55,7 +55,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialTab = 'agent' }) =>
       </main>
 
       {/* Feedback Tab - appears on all pages */}
-      <FeedbackTab />
+      <FeedbackTab showFab={false} />
     </div>
   );
 };

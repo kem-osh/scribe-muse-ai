@@ -10,7 +10,8 @@ import {
   Share2,
   Settings,
   Sparkles,
-  LogOut
+  LogOut,
+  MessageCircle
 } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 
@@ -35,6 +36,10 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
   user
 }) => {
   const { signOut } = useAuth();
+
+  const handleFeedbackClick = () => {
+    window.dispatchEvent(new Event('open-feedback'));
+  };
 
   return (
     <nav className="tab-nav shadow-sm">
@@ -93,11 +98,21 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
           </div>
         </div>
 
-        {/* User Info & Sign Out */}
+        {/* User Info & Actions */}
         <div className="flex items-center space-x-3 min-w-0">
           <div className="hidden lg:block text-right min-w-0">
             <p className="text-sm text-muted-foreground/80 truncate">{user?.email}</p>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleFeedbackClick}
+            className="btn-ghost flex-shrink-0 hover:bg-accent/10 hover:text-accent transition-all duration-200"
+            aria-label="Send feedback"
+          >
+            <MessageCircle className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Feedback</span>
+          </Button>
           <Button
             variant="ghost"
             size="sm"
